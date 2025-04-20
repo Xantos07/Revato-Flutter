@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'liste_avec_ajout.dart';
-import 'champ_texte.dart';
+import 'add_list.dart';
+import 'text_field.dart';
 
 
 class StepPage extends StatelessWidget {
@@ -43,9 +43,11 @@ class StepPage extends StatelessWidget {
                   ),
                 ),
               ),
+
+
               const SizedBox(height: 24),
               isList
-                  ? ListeAvecAjout(hint: hint)
+                  ? ChampTextList(hint: hint)
                   : ChampTexte(hint: hint, isLong: isLongText),
 
             ],

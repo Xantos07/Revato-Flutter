@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+
+/// Champ texte stylé, avec option de suffix widget (bouton, icône…)
+class ChampTexte extends StatelessWidget {
+  final String hint;
+  final bool isLong;
+  final TextEditingController? controller;
+  final Widget? suffix;
+
+  const ChampTexte({
+    Key? key,
+    required this.hint,
+    required this.isLong,
+    this.controller,
+    this.suffix,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: isLong ? 400 : 100,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(50),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha((0.08 * 255).round()),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          )
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller,
+              maxLines: isLong ? 14 : 1,
+              decoration: InputDecoration(
+                hintText: hint,
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+
+          // Si on a passé un suffix, on l'affiche dedans :
+          if (suffix != null) suffix!,
+        ],
+      ),
+    );
+  }
+}
