@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screen_redaction_dream.dart';
+import 'redaction_screen.dart';
+import 'navigation_bar.dart';
 
 class CarrouselReveApp extends StatelessWidget {
   const CarrouselReveApp({super.key});
@@ -12,7 +13,7 @@ class CarrouselReveApp extends StatelessWidget {
         primarySwatch: Colors.deepPurple,
         scaffoldBackgroundColor: const Color(0xFFE4DAED),
       ),
-      home: const CreationReveScreen(),
+      home: const HomeScaffold(),
     );
   }
 }
