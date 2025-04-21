@@ -2,78 +2,69 @@
 
 namespace App\Controller;
 
-use App\Entity\Actor;
+use App\Dto\DreamCreateDTO;
 use App\Entity\Dream;
+use App\Entity\Actor;
 use App\Entity\Location;
-use App\Service\DreamService;
-use App\Repository\ActorRepository;
-use App\Repository\LocationRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DreamController extends AbstractController
 {
-    #[Route('/api/dreams', name: 'api_dreams_list', methods: ['GET'])]
-    public function index(DreamService $dreamService): JsonResponse
-    {
-        $dreams = $dreamService->getAll();
-
-        return $this->json($dreams);
-    }
-
     #[Route('/api/dreams', name: 'api_dreams_create', methods: ['POST'])]
     public function create(
         Request $request,
-        DreamService $dreamService,
-        ActorRepository $actorRepo,
-        LocationRepository $locationRepo,
-        EntityManagerInterface $em,
-        LoggerInterface $logger
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        EntityManagerInterface $em
     ): JsonResponse {
+        try {
+            $dto = $serializer->deserialize($request->getContent(), DreamCreateDTO::class, 'json');
+        } catch (NotEncodableValueException $e) {
+            return $this->json(['error' => 'JSON invalide ou mal encodé.'], 400);
+        }
 
-        $data = json_decode($request->getContent(), true);
-        if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
-            return new JsonResponse([
-                'error' => 'Erreur de décodage JSON : ' . json_last_error_msg(),
-            ], 400);
+        if ($dto === null) {
+            return $this->json(['error' => 'Impossible de désérialiser le contenu'], 400);
+        }
+
+        $errors = $validator->validate($dto);
+        if (count($errors) > 0) {
+            return $this->json(['errors' => (string) $errors], 400);
         }
 
         $dream = new Dream();
-        $dream->setTitle($data['title'] ?? '');
-        $dream->setContent($data['content'] ?? '');
-        $dream->setFeeling($data['feeling'] ?? '');
+        $dream->setTitle($dto->title);
+        $dream->setContent($dto->content);
+        $dream->setFeeling($dto->feeling);
 
-        // 👥 ACTORS (par nom)
-        foreach ($data['actors'] ?? [] as $actorName) {
-            $actor = $actorRepo->findOneBy(['name' => $actorName]);
-            if (!$actor) {
-                $actor = new Actor();
+        foreach ($dto->actors as $actorName) {
+            $actor = $em->getRepository(Actor::class)->findOneBy(['name' => $actorName]) ?? new Actor();
+            if (!$actor->getId()) {
                 $actor->setName($actorName);
                 $em->persist($actor);
             }
             $dream->addActor($actor);
         }
 
-        // 📍 LOCATIONS (par nom)
-        foreach ($data['locations'] ?? [] as $locationName) {
-            $location = $locationRepo->findOneBy(['name' => $locationName]);
-            if (!$location) {
-                $location = new Location();
+        foreach ($dto->locations as $locationName) {
+            $location = $em->getRepository(Location::class)->findOneBy(['name' => $locationName]) ?? new Location();
+            if (!$location->getId()) {
                 $location->setName($locationName);
                 $em->persist($location);
             }
             $dream->addLocation($location);
         }
 
-        $dreamService->save($dream, true);
+        $em->persist($dream);
+        $em->flush();
 
-        return $this->json([
-            'message' => 'Dream successfully created!',
-            'id' => $dream->getId()
-        ], 201);
+        return $this->json(['message' => 'Dream created successfully!', 'id' => $dream->getId()], 201);
     }
 }
