@@ -15,7 +15,7 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ./api/public:/srv
+      - ./api:/var/www
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
     depends_on:
       - php
