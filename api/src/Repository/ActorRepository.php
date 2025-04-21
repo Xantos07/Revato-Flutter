@@ -15,7 +15,13 @@ class ActorRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Actor::class);
     }
-
+    public function save(Actor $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
     //    /**
     //     * @return Actor[] Returns an array of Actor objects
     //     */
