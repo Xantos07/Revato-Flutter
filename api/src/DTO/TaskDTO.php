@@ -2,6 +2,7 @@
 
 namespace App\DTO;
 
+
 # Pour exposer uniquement les champs qu’on veut montrer au frontend
 # Éviter d'exposer directement l'entité Doctrine
 class TaskDTO

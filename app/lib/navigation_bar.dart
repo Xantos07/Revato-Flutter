@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'redaction_screen.dart';
 import 'profil_screen.dart';
+import 'views/taskList.dart';
 
 class HomeScaffold extends StatefulWidget {
   const HomeScaffold({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
   final _pages = [
     ProfileScreen(),
     CreationReveScreen(),
-    CreationReveScreen(),
+    TaskList(),
   ];
 
   @override
@@ -21,7 +22,6 @@ class _HomeScaffoldState extends State<HomeScaffold> {
     return Scaffold(
       body: _pages[_currentIndex],
 
-      // Le FloatingActionButton (ton bouton “crayon” au milieu)
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepPurple,
         child: Icon(Icons.edit, size: 28),
@@ -29,7 +29,6 @@ class _HomeScaffoldState extends State<HomeScaffold> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      // Le BottomAppBar qui accueille les autres icônes
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         notchMargin: 8,
@@ -38,7 +37,6 @@ class _HomeScaffoldState extends State<HomeScaffold> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Icône Profil
               IconButton(
                 icon: Icon(
                   Icons.person,
@@ -46,7 +44,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
                 ),
                 onPressed: () => setState(() => _currentIndex = 0),
               ),
-              // Icône Journal (à droite du FAB)
+
               IconButton(
                 icon: Icon(
                   Icons.book,
@@ -54,9 +52,6 @@ class _HomeScaffoldState extends State<HomeScaffold> {
                 ),
                 onPressed: () => setState(() => _currentIndex = 2),
               ),
-
-              // Si tu veux un 4e bouton, ajoute-le ici + ajuste spaceBetween
-              // IconButton(...),
             ],
           ),
         ),
