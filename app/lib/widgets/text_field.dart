@@ -6,13 +6,14 @@ class ChampTexte extends StatelessWidget {
   final bool isLong;
   final TextEditingController? controller;
   final Widget? suffix;
-
+  final void Function(String)? onChanged;
   const ChampTexte({
     Key? key,
     required this.hint,
     required this.isLong,
     this.controller,
     this.suffix,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -35,6 +36,7 @@ class ChampTexte extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
+              onChanged: onChanged,
               controller: controller,
               maxLines: isLong ? 14 : 1,
               decoration: InputDecoration(

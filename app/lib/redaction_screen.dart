@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
-import '../widgets/step_page_header.dart';
+import '../widgets/header_dream.dart';
 import '../widgets/step_page.dart';
+import 'dream_form_data.dart';
 
-class CreationReveScreen extends StatefulWidget {
-  const CreationReveScreen({super.key});
+class RedactionScreen extends StatefulWidget {
+  const RedactionScreen({super.key});
 
   @override
-  State<CreationReveScreen> createState() => _CreationReveScreenState();
+  State<RedactionScreen> createState() => _RedactionScreenState();
 }
 
-class _CreationReveScreenState extends State<CreationReveScreen> {
+class _RedactionScreenState extends State<RedactionScreen> {
   final PageController _pageController = PageController();
   int _pageIndex = 0;
   final int totalPages = 8;
 
+  final DreamFormData formData = DreamFormData(
+    title: '',
+    actors: [],
+    locations: [],
+    content: '',
+    feeling: '',
+    tagsBeforeEvent: [],
+    tagsBeforeFeeling: [],
+    tagsDreamFeeling: [],
+  );
+
   void _nextPage() {
+    print("📝 Données actuelles : ${formData.toJson()}");
+
     if (_pageIndex < totalPages - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -30,20 +44,20 @@ class _CreationReveScreenState extends State<CreationReveScreen> {
     return Scaffold(
       body: Column(
         children: [
-          ReveHeader(currentPage: _pageIndex, totalPages: totalPages),
+          HeaderDream(currentPage: _pageIndex, totalPages: totalPages),
           Expanded(
             child: PageView(
               controller: _pageController,
               onPageChanged: (index) => setState(() => _pageIndex = index),
-              children: const [
-                StepPage(title: "Titre du rêve", hint: "Ex : Le château volant"),
-                StepPage(title: "Acteurs", isList: true, hint: "Acteur"),
-                StepPage(title: "Lieux", isList: true, hint: "Lieux"),
-                StepPage(title: "Notation du rêve", hint: "Ex : Tout commença lorsque je me retrouve dans ma maison à côté de mon chien..." , isLongText: true),
-                StepPage(title: "Notation du ressenti du rêve", hint: "Ex : Le rêve commença très bien mais j'ai vite eu peur" , isLongText: true),
-                StepPage(title: "Tag événementiel de la veille", isList: true, hint: "Tag événementiel de la veille"),
-                StepPage(title: "Tag ressenti la veille", isList: true, hint: "Tag ressenti la veille"),
-                StepPage(title: "Tag ressenti dans le rêve", isList: true, hint: "Tag ressenti dans le rêve"),
+              children: [
+                StepPage(title: "Titre du rêve", hint: "Ex : Le château volant",onChanged: (value) => formData.title = value),
+                 StepPage(title: "Acteurs", isList: true, hint: "Acteur",   onListChanged: (value) => formData.actors = value),
+                 StepPage(title: "Lieux", isList: true, hint: "Lieux", onListChanged: (value) => formData.locations = value),
+                 StepPage(title: "Notation du rêve", hint: "Ex : Tout commença lorsque je me retrouve dans ma maison à côté de mon chien..." , isLongText: true, onChanged: (value) => formData.content = value),
+                 StepPage(title: "Notation du ressenti du rêve", hint: "Ex : Le rêve commença très bien mais j'ai vite eu peur" , isLongText: true,onChanged: (value) => formData.feeling = value),
+                 StepPage(title: "Tag événementiel de la veille", isList: true, hint: "Tag événementiel de la veille",onListChanged: (value) => formData.tagsBeforeEvent = value),
+                 StepPage(title: "Tag ressenti la veille", isList: true, hint: "Tag ressenti la veille",onListChanged: (value) => formData.tagsBeforeFeeling = value),
+                 StepPage(title: "Tag ressenti dans le rêve", isList: true, hint: "Tag ressenti dans le rêve",onListChanged: (value) => formData.tagsDreamFeeling = value),
               ],
             ),
           ),
