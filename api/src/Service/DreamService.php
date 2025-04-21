@@ -45,4 +45,12 @@ class DreamService
         $this->em->flush();
         return true;
     }
+
+    public function save(Dream $dream, bool $flush = false): void
+    {
+        $this->em->persist($dream);
+        if ($flush) {
+            $this->em->flush();
+        }
+    }
 }
