@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Dto\DreamCreateDTO;
+use App\DTO\DreamCreateDTO;
 use App\Entity\Dream;
 use App\Entity\Actor;
 use App\Entity\Location;

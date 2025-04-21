@@ -1,7 +1,9 @@
+import 'package:app/models/dream.dart';
 import 'package:flutter/material.dart';
 import '../widgets/header_dream.dart';
 import '../widgets/step_page.dart';
 import 'dream_form_data.dart';
+import '../controller/dream_controller.dart';
 
 class RedactionScreen extends StatefulWidget {
   const RedactionScreen({super.key});
@@ -26,7 +28,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
     tagsDreamFeeling: [],
   );
 
-  void _nextPage() {
+  void _nextPage() async {
     print("📝 Données actuelles : ${formData.toJson()}");
 
     if (_pageIndex < totalPages - 1) {
@@ -35,7 +37,25 @@ class _RedactionScreenState extends State<RedactionScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      debugPrint("\u{1F680} Fini !");
+      final dream = formData.toDream();
+      final success = await DreamController().createDream(dream);
+
+
+      if (success) {
+        debugPrint("✅ Rêve envoyé !");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Rêve envoyé avec succès !")),
+          );
+        }
+      } else {
+        debugPrint("❌ Échec de l'envoi.");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Erreur lors de l'envoi.")),
+          );
+        }
+      }
     }
   }
 

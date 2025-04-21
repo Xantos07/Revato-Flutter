@@ -1,3 +1,5 @@
+import '../models/dream.dart';
+
 class DreamFormData {
   String title;
   List<String> actors;
@@ -30,5 +32,15 @@ class DreamFormData {
       "tagsBeforeFeeling": tagsBeforeFeeling,
       "tagsDreamFeeling": tagsDreamFeeling,
     };
+  }
+
+  Dream toDream() {
+    return Dream(
+      title: title,
+      content: content,
+      feeling: feeling,
+      actors: actors,
+      locations: locations,
+    );
   }
 }
