@@ -25,6 +25,9 @@ class TaskController extends AbstractController
         TaskService $service,
         ValidatorInterface $validator
     ): JsonResponse {
+
+        $user = $this->getUser();
+
         $data = json_decode($request->getContent(), true);
 
         $dto = new CreateTaskDTO();
@@ -36,7 +39,7 @@ class TaskController extends AbstractController
             return $this->json(['errors' => (string) $errors], 400);
         }
 
-        $task = $service->createTask($dto);
+        $task = $service->createTask($dto, $user);
 
         return $this->json([
             'message' => 'Tâche créée avec succès',
