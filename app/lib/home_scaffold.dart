@@ -13,7 +13,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
   int _currentIndex = 1;
   final _pages = [
     ProfileScreen(),
-    CreationReveScreen(),
+    RedactionScreen(),
     TaskList(),
   ];
 

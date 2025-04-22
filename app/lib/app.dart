@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'redaction_screen.dart';
-import 'navigation_bar.dart';
+import 'home_scaffold.dart';
 
 class CarrouselReveApp extends StatelessWidget {
   const CarrouselReveApp({super.key});

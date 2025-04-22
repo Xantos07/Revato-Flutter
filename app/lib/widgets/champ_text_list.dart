@@ -5,7 +5,9 @@ import 'text_field.dart';
 /// Widget de saisie + bouton + + listes de chips scrollable
 class ChampTextList extends StatefulWidget {
   final String hint;
-  const ChampTextList({Key? key, required this.hint}) : super(key: key);
+  final void Function(List<String>)? onListChanged;
+
+  const ChampTextList({Key? key, required this.hint, this.onListChanged}) : super(key: key);
 
   @override
   State<ChampTextList> createState() => _ChampTextListState();
@@ -22,6 +24,7 @@ class _ChampTextListState extends State<ChampTextList> {
       _items.add(text);
       _controller.clear();
     });
+    widget.onListChanged?.call(_items);
   }
 
   @override
@@ -60,7 +63,10 @@ class _ChampTextListState extends State<ChampTextList> {
                 children: _items.map((item) => InputChip(
                   label: Text(item),
                   backgroundColor: Colors.deepPurple.withAlpha((0.1 * 255).round()),
-                  onDeleted: () => setState(() => _items.remove(item)),
+                  onDeleted: () {
+                    setState(() => _items.remove(item));
+                    widget.onListChanged?.call(_items);
+                  },
                 )).toList(),
               ),
             ),

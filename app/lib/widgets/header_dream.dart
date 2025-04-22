@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ReveHeader extends StatelessWidget {
+class HeaderDream extends StatelessWidget {
   final int currentPage;
   final int totalPages;
 
-  const ReveHeader({super.key, required this.currentPage, required this.totalPages});
+  const HeaderDream({super.key, required this.currentPage, required this.totalPages});
 
   @override
   Widget build(BuildContext context) {

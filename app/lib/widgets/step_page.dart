@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'add_list.dart';
+import 'champ_text_list.dart';
 import 'text_field.dart';
 
 
@@ -8,8 +8,11 @@ class StepPage extends StatelessWidget {
   final String hint;
   final bool isList;
   final bool isLongText;
+  final void Function(String)? onChanged;
+  final void Function(List<String>)? onListChanged;
 
-  const StepPage({super.key, required this.title, required this.hint, this.isList = false,     this.isLongText = false,});
+  const StepPage({super.key, required this.title, required this.hint, this.isList = false,
+    this.isLongText = false,this.onChanged, this.onListChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +50,8 @@ class StepPage extends StatelessWidget {
 
               const SizedBox(height: 24),
               isList
-                  ? ChampTextList(hint: hint)
-                  : ChampTexte(hint: hint, isLong: isLongText),
+                  ? ChampTextList(hint: hint, onListChanged: onListChanged)
+                  : ChampTexte(hint: hint, isLong: isLongText,onChanged: onChanged),
 
             ],
           ),
