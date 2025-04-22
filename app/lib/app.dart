@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'redaction_screen.dart';
+import 'SplashScreen.dart';
+import '../views/register_screen.dart';
 import 'home_scaffold.dart';
 
 class CarrouselReveApp extends StatelessWidget {
@@ -13,7 +14,12 @@ class CarrouselReveApp extends StatelessWidget {
         primarySwatch: Colors.deepPurple,
         scaffoldBackgroundColor: const Color(0xFFE4DAED),
       ),
-      home: const HomeScaffold(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/register': (context) => RegisterScreen(),
+        '/home': (context) => const HomeScaffold(),
+      },
     );
   }
 }
