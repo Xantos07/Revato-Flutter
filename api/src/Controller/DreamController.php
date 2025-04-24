@@ -6,6 +6,7 @@ use App\DTO\DreamCreateDTO;
 use App\Entity\Dream;
 use App\Entity\Actor;
 use App\Entity\Location;
+use App\Service\DreamService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +23,7 @@ class DreamController extends AbstractController
         Request $request,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
-        EntityManagerInterface $em
+        DreamService $dreamService
     ): JsonResponse {
         try {
             $dto = $serializer->deserialize($request->getContent(), DreamCreateDTO::class, 'json');
@@ -39,31 +40,9 @@ class DreamController extends AbstractController
             return $this->json(['errors' => (string) $errors], 400);
         }
 
-        $dream = new Dream();
-        $dream->setTitle($dto->title);
-        $dream->setContent($dto->content);
-        $dream->setFeeling($dto->feeling);
+        $user = $this->getUser();
 
-        foreach ($dto->actors as $actorName) {
-            $actor = $em->getRepository(Actor::class)->findOneBy(['name' => $actorName]) ?? new Actor();
-            if (!$actor->getId()) {
-                $actor->setName($actorName);
-                $em->persist($actor);
-            }
-            $dream->addActor($actor);
-        }
-
-        foreach ($dto->locations as $locationName) {
-            $location = $em->getRepository(Location::class)->findOneBy(['name' => $locationName]) ?? new Location();
-            if (!$location->getId()) {
-                $location->setName($locationName);
-                $em->persist($location);
-            }
-            $dream->addLocation($location);
-        }
-
-        $em->persist($dream);
-        $em->flush();
+        $dream = $dreamService->create($dto, $user);
 
         return $this->json(['message' => 'Dream created successfully!', 'id' => $dream->getId()], 201);
     }

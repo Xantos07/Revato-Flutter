@@ -25,6 +25,8 @@ class Dream
     #[ORM\Column(type: Types::TEXT)]
     private ?string $feeling = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'dreams')]
+    private ?User $user = null;
     #[ORM\ManyToMany(targetEntity: Actor::class, inversedBy: 'dreams')]
     private Collection $actors;
 
@@ -114,6 +116,17 @@ class Dream
     public function removeLocation(Location $location): self
     {
         $this->locations->removeElement($location);
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 }
