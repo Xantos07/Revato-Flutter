@@ -19,7 +19,7 @@ class ChampTexte extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: isLong ? 400 : 100,
+      height: isLong ? 400 : 75,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
