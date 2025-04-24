@@ -7,7 +7,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Si tu veux un AppBar distinct plutôt que celui du HomeScaffold
       appBar: AppBar(
         title: const Text("Mon Profil"),
         centerTitle: true,
@@ -20,7 +19,8 @@ class ProfileScreen extends StatelessWidget {
             CircleAvatar(
               radius: 48,
               backgroundColor: Colors.deepPurple.shade200,
-              child: Icon(Icons.person, size: 64, color: Colors.white),
+              backgroundImage: AssetImage('assets/profil.png'),
+              //child: Icon(Icons.person, size: 64, color: Colors.white),
             ),
             const SizedBox(height: 12),
             const Text(
