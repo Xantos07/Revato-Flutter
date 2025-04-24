@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'SplashScreen.dart';
 import '../views/register_screen.dart';
+import '../views/login_screen.dart';
 import 'home_scaffold.dart';
 
 class CarrouselReveApp extends StatelessWidget {
@@ -17,6 +18,7 @@ class CarrouselReveApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => const HomeScaffold(),
       },

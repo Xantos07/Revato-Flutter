@@ -18,13 +18,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuth() async {
-    await Future.delayed(const Duration(seconds: 2)); // Simule le chargement
-    final token = await _storage.read(key: 'jwt_token');
+    await Future.delayed(const Duration(seconds: 2));
+    final token = await _storage.read(key: 'jwt');
 
     if (token != null) {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
-      Navigator.pushReplacementNamed(context, '/register');
+      Navigator.pushReplacementNamed(context, '/login');
     }
   }
 
