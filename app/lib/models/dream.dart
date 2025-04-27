@@ -20,4 +20,12 @@ class Dream {
     'actors': actors,
     'locations': locations,
   };
+
+  factory Dream.fromJson(Map<String, dynamic> json) => Dream(
+    title: json['title'],
+    content: json['content'],
+    feeling: json['feeling'],
+    actors: List<String>.from(json['actors']),
+    locations: List<String>.from(json['locations']),
+  );
 }

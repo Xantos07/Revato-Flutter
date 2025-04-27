@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'views/redaction_screen.dart';
 import 'views/profil_screen.dart';
-import 'views/taskList.dart';
+import 'views/dreamList.dart';
 
 class HomeScaffold extends StatefulWidget {
   const HomeScaffold({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class _HomeScaffoldState extends State<HomeScaffold> {
   final _pages = [
     ProfileScreen(),
     RedactionScreen(),
-    TaskList(),
+    DreamList(),
   ];
 
   @override

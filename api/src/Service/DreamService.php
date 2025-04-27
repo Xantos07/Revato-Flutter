@@ -58,6 +58,19 @@ class DreamService
 
         return $dream;
     }
+    public function getDreamsByUser(User $user): array
+    {
+        $dreams = $this->repository->findBy(['user' => $user]);
+        return array_map(function (Dream $dream) {
+            return new DreamCreateDTO(
+                $dream->getTitle(),
+                $dream->getContent(),
+                $dream->getFeeling(),
+                $dream->getActors()->map(fn($actor) => $actor->getName())->toArray(),
+                $dream->getLocation()->map(fn($location) => $location->getName())->toArray()
+            );
+        }, $dreams);
+    }
 
     public function delete(int $id): bool
     {
