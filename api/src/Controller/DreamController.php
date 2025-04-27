@@ -21,52 +21,40 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DreamController extends AbstractController
 {
     #[Route('/api/dreams', name: 'api_dreams_create', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function create(
-        Request $request,
+        Request             $request,
         SerializerInterface $serializer,
-        ValidatorInterface $validator,
-        DreamService $dreamService,
-        JWTService $jwtService,
-        UserRepository $userRepo
+        ValidatorInterface  $validator,
+        DreamService        $dreamService,
     ): JsonResponse {
+        // À ce stade, l'APIAuthenticator a déjà validé le JWT et rempli le token,
+        // donc getUser() renvoie l'entité App\Entity\User
+        $user = $this->getUser();
 
-        $authHeader = $request->headers->get('Authorization');
-
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return $this->json(['error' => 'Token JWT manquant.'], 401);
-        }
-
-        $token = substr($authHeader, 7);
-
-        if (!$jwtService->isValid($token) || $jwtService->isExpired($token)) {
-            return $this->json(['error' => 'Token JWT invalide ou expiré.'], 401);
-        }
-
-        $payload = $jwtService->getPayload($token);
-        $userId = $payload['user_id'] ?? null;
-
-        if (!$userId || !($user = $userRepo->find($userId))) {
-            return $this->json(['error' => 'Utilisateur introuvable.'], 404);
-        }
-
+        // Désérialisation
         try {
-            $dto = $serializer->deserialize($request->getContent(), DreamCreateDTO::class, 'json');
+            $dto = $serializer->deserialize(
+                $request->getContent(),
+                DreamCreateDTO::class,
+                'json'
+            );
         } catch (NotEncodableValueException $e) {
-            return $this->json(['error' => 'JSON invalide ou mal encodé.'], 400);
+            return $this->json(['error' => 'JSON invalide ou mal formé.'], 400);
         }
 
-        if ($dto === null) {
-            return $this->json(['error' => 'Impossible de désérialiser le contenu'], 400);
-        }
-
+        // Validation
         $errors = $validator->validate($dto);
         if (count($errors) > 0) {
             return $this->json(['errors' => (string) $errors], 400);
         }
 
-
+        // Création du rêve
         $dream = $dreamService->create($dto, $user);
 
-        return $this->json(['message' => 'Dream created successfully!', 'id' => $dream->getId()], 201);
+        return $this->json([
+            'message' => 'Dream created successfully!',
+            'id'      => $dream->getId(),
+        ], 201);
     }
 }
