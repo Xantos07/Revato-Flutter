@@ -12,6 +12,7 @@ use App\Service\JWTService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -28,11 +29,9 @@ class DreamController extends AbstractController
         ValidatorInterface  $validator,
         DreamService        $dreamService,
     ): JsonResponse {
-        // À ce stade, l'APIAuthenticator a déjà validé le JWT et rempli le token,
-        // donc getUser() renvoie l'entité App\Entity\User
+
         $user = $this->getUser();
 
-        // Désérialisation
         try {
             $dto = $serializer->deserialize(
                 $request->getContent(),

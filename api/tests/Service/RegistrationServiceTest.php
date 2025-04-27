@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use App\Service\RegistrationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -44,6 +45,54 @@ class RegistrationServiceTest extends TestCase
         $this->assertArrayHasKey('error', $result);
         $this->assertEquals(409, $result['code']);
     }
+
+    public function testRegisterFailsIfEmailInvalid()
+    {
+        $email = 'pas-un-email';
+        $password = '1234';
+
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $hasher = $this->createMock(UserPasswordHasherInterface::class);
+
+        // Simule un échec de validation
+        $violationList = new ConstraintViolationList([new ConstraintViolation(
+            'Invalid email', null, [], '', 'email', 'pas-un-email'
+        )]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())->method('validate')->willReturn($violationList);
+
+        $service = new RegistrationService($em, $hasher, $validator);
+
+        $result = $service->register($email, $password);
+
+        $this->assertArrayHasKey('error', $result);
+        $this->assertEquals(400, $result['code']);
+    }
+
+    public function testRegisterFailsIfPasswordTooShort()
+    {
+        $email = 'test@example.com';
+        $password = '12'; // trop court
+
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $hasher = $this->createMock(UserPasswordHasherInterface::class);
+
+        $violationList = new ConstraintViolationList([new ConstraintViolation(
+            'Password too short', null, [], '', 'password', '12'
+        )]);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())->method('validate')->willReturn($violationList);
+
+        $service = new RegistrationService($em, $hasher, $validator);
+
+        $result = $service->register($email, $password);
+
+        $this->assertArrayHasKey('error', $result);
+        $this->assertEquals(400, $result['code']);
+    }
+
 
     public function testRegisterSuccess()
     {
