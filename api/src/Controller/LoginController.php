@@ -41,6 +41,11 @@ class LoginController extends AbstractController
 
         $token = $jwt->generate($header, $payload, $this->getParameter('app.jwtsecret'));
 
+        $user->setApiToken($token);
+
+        $em->persist($user);
+        $em->flush();
+
         return $this->json([
             'token' => $token,
         ]);

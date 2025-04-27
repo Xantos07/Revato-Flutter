@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Dream::class)]
     private Collection $dreams;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $apiToken = null;
+
     public function __construct()
     {
         $this->dreams = new ArrayCollection();
@@ -145,6 +148,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $dream->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(?string $apiToken): static
+    {
+        $this->apiToken = $apiToken;
 
         return $this;
     }
