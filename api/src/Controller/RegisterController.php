@@ -49,19 +49,22 @@ class RegisterController extends AbstractController
             return $this->json(['error' => 'Email déjà utilisé'], 409);
         }
 
-        // Créer l'utilisateur
+        // 1. Création utilisateur, persist en base pour générer l'id
         $user = new User();
         $user->setEmail($email);
         $user->setPassword($passwordHasher->hashPassword($user, $password));
-
         $em->persist($user);
         $em->flush();
 
-        // Générer le token
+        // 2. Génère le JWT AVEC le bon id
         $header = ['alg' => 'HS256', 'typ' => 'JWT'];
         $payload = ['user_id' => $user->getId()];
-
         $token = $jwt->generate($header, $payload, $this->getParameter('app.jwtsecret'));
+
+        $user->setApiToken($token);
+        $em->flush(); // pour sauvegarder le token aussi
+
+
 
         return $this->json([
             'message' => 'Utilisateur créé avec succès',
