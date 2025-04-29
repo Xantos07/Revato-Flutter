@@ -5,7 +5,6 @@ class Dream {
   String feeling;
   List<String> actors;
   List<String> locations;
-  //tag
   List<String> tagsBeforeEvent;
   List<String> tagsBeforeFeeling;
   List<String> tagsDreamFeeling;
@@ -22,6 +21,7 @@ class Dream {
     required this.tagsDreamFeeling,
   });
 
+
   Map<String, dynamic> toJson() => {
     'title': title,
     'content': content,
@@ -33,15 +33,16 @@ class Dream {
     'tagsDreamFeeling': tagsDreamFeeling,
   };
 
+
   factory Dream.fromJson(Map<String, dynamic> json) => Dream(
     date: DateTime.parse(json['date']),
-    title: json['title'],
-    content: json['content'],
-    feeling: json['feeling'],
-    actors: List<String>.from(json['actors']),
-    locations: List<String>.from(json['locations']),
-    tagsBeforeEvent: List<String>.from(json['tagsBeforeEvent']),
-    tagsBeforeFeeling: List<String>.from(json['tagsBeforeFeeling']),
-    tagsDreamFeeling: List<String>.from(json['tagsDreamFeeling']),
+    title: json['title'] ?? '',
+    content: json['content'] ?? '',
+    feeling: json['feeling'] ?? '',
+    actors: List<String>.from(json['actors'] ?? []),
+    locations: List<String>.from(json['locations'] ?? []),
+    tagsBeforeEvent: List<String>.from(json['tagsBeforeEvent'] ?? []),
+    tagsBeforeFeeling: List<String>.from(json['tagsBeforeFeeling'] ?? []),
+    tagsDreamFeeling: List<String>.from(json['tagsDreamFeeling'] ?? []),
   );
 }

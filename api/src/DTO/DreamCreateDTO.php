@@ -6,6 +6,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class DreamCreateDTO
 {
+    #[Assert\NotBlank]
+    public string $date;
 
     #[Assert\NotBlank]
     public string $title;
@@ -38,6 +40,7 @@ class DreamCreateDTO
 
 
     public function __construct(
+        string $date = '',
         string $title = '',
         string $content = '',
         string $feeling = '',
@@ -47,6 +50,7 @@ class DreamCreateDTO
         array $tagsBeforeFeeling = [],
         array $tagsDreamFeeling = [],
     ) {
+        $this->date = $date ?? '';
         $this->title = $title ?? '';
         $this->content = $content ?? '';
         $this->feeling = $feeling ?? '';

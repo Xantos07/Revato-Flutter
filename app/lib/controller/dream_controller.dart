@@ -47,13 +47,20 @@ class DreamController {
       headers: headers,
     );
 
+    print('🛠️ Réponse brute : ${response.body}');
+
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
+
+      print('🧩 Données décodées : $data');
+
       return data.map((json) => Dream.fromJson(json)).toList();
     } else {
+      print('❌ Erreur HTTP : ${response.statusCode}');
       throw Exception('Erreur: ${response.statusCode}');
     }
   }
+
 }
 
 

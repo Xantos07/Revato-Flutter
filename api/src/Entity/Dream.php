@@ -200,7 +200,7 @@ class Dream
     }
 
 
-    public function getTagDreamFeeling(): Collection
+    public function getTagsDreamFeeling(): Collection
     {
         return $this->tagsDreamFeeling;
     }

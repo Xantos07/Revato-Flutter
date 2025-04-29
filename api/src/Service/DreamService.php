@@ -10,12 +10,14 @@ use App\Entity\Tag;
 use App\Entity\User;
 use App\Repository\DreamRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class DreamService
 {
     public function __construct(
         private DreamRepository $repository,
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
+        private LoggerInterface $logger
     ) {}
 
     public function getAll(): array
@@ -90,8 +92,10 @@ class DreamService
     public function getDreamsByUser(User $user): array
     {
         $dreams = $this->repository->findBy(['user' => $user]);
+
         return array_map(function (Dream $dream) {
             return new DreamCreateDTO(
+                date: $dream->getDate()->format('Y-m-d\TH:i:s'),
                 title: $dream->getTitle(),
                 content: $dream->getContent(),
                 feeling: $dream->getFeeling(),
