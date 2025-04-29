@@ -1,6 +1,7 @@
 import '../models/dream.dart';
 
 class DreamFormData {
+  DateTime date;
   String title;
   List<String> actors;
   List<String> locations;
@@ -11,6 +12,7 @@ class DreamFormData {
   List<String> tagsDreamFeeling;
 
   DreamFormData({
+    required this.date,
     required this.title,
     required this.actors,
     required this.locations,
@@ -23,6 +25,7 @@ class DreamFormData {
 
   Map<String, dynamic> toJson() {
     return {
+      "date": date,
       "title": title,
       "actors": actors,
       "locations": locations,
@@ -36,11 +39,15 @@ class DreamFormData {
 
   Dream toDream() {
     return Dream(
+      date: date,
       title: title,
       content: content,
       feeling: feeling,
       actors: actors,
       locations: locations,
+      tagsBeforeEvent: tagsBeforeEvent,
+      tagsBeforeFeeling: tagsBeforeFeeling,
+      tagsDreamFeeling: tagsDreamFeeling,
     );
   }
 }

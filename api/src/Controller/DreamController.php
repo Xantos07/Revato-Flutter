@@ -3,13 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\DreamCreateDTO;
-use App\Entity\Dream;
-use App\Entity\Actor;
-use App\Entity\Location;
-use App\Repository\UserRepository;
 use App\Service\DreamService;
-use App\Service\JWTService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -21,6 +15,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DreamController extends AbstractController
 {
+    #[Route('/api/dreams', name: 'api_dreams', methods: ['GET'])]
+    public function list(DreamService $service): JsonResponse
+    {
+        $user = $this->getUser();
+        $dreams = $service->getDreamsByUser($user);
+        return $this->json($dreams);
+    }
     #[Route('/api/dreams', name: 'api_dreams_create', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function create(

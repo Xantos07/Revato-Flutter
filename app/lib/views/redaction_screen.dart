@@ -18,6 +18,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
   final int totalPages = 8;
 
   final DreamFormData formData = DreamFormData(
+    date: DateTime.now(),
     title: '',
     actors: [],
     locations: [],

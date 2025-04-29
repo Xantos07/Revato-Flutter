@@ -34,6 +34,33 @@ class DreamController {
     return response.statusCode == 201;
   }
 
+// GET: récupérer toutes les rêves
+  Future<List<Dream>> getDreams() async {
+    String? token = await storage.read(key: 'jwt');
+    final headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    final response = await http.get(
+      Uri.parse('$API_BASE_URL/api/dreams'),
+      headers: headers,
+    );
+
+    print('🛠️ Réponse brute : ${response.body}');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+
+      print('🧩 Données décodées : $data');
+
+      return data.map((json) => Dream.fromJson(json)).toList();
+    } else {
+      print('❌ Erreur HTTP : ${response.statusCode}');
+      throw Exception('Erreur: ${response.statusCode}');
+    }
+  }
+
 }
 
 
