@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/dream.dart';
+import '../models/app_colors.dart'; // si tu utilises des couleurs custom
 
 class DreamCard extends StatelessWidget {
   final Dream dream;
-  const DreamCard({ required this.dream, Key? key }) : super(key: key);
+  const DreamCard({required this.dream, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext ctx) {
@@ -18,17 +19,43 @@ class DreamCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 4),
             Text(
               dream.title,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
+
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                ...dream.tagsBeforeEvent.map((tag) => Chip(
+                  label: Text(tag),
+                  backgroundColor: AppColors.previousEvent,
+                  labelStyle: TextStyle(color: Colors.white),
+                )),
+                ...dream.tagsBeforeFeeling.map((tag) => Chip(
+                  label: Text(tag),
+                  backgroundColor: AppColors.previousFeeling,
+                  labelStyle: TextStyle(color: Colors.white),
+                )),
+                ...dream.tagsDreamFeeling.map((tag) => Chip(
+                  label: Text(tag),
+                  backgroundColor: AppColors.dreamFeeling,
+                  labelStyle: TextStyle(color: Colors.white),
+                )),
+              ],
+            ),
+
             const SizedBox(height: 4),
             Text(
-              dream.content,
+              dream.content.length > 20
+                  ? '${dream.content.substring(0, 40)}...'
+                  : dream.content,
               style: const TextStyle(fontStyle: FontStyle.italic),
             ),
 
-            //  ici un Wrap de chips pour acteurs / lieux, etc.
           ],
         ),
       ),
