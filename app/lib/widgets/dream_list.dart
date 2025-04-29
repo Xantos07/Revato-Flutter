@@ -3,6 +3,7 @@ import '../models/dream.dart';
 import '../../controller/dream_controller.dart';
 import 'dream_section.dart';
 import 'dream_card.dart';
+import 'header_filtered_dream.dart';
 
 class DreamList extends StatefulWidget {
   const DreamList({Key? key}) : super(key: key);
@@ -50,29 +51,25 @@ class _DreamListState extends State<DreamList> {
         final grouped = _groupByDate(list);
 
         return ListView(
-          children: grouped.entries.map((entry) {
+          children: [
+
+          const HeaderFilteredDream(),
+
+            ...grouped.entries.map((entry) {
             final date     = entry.key;
             final dreamsOn = entry.value;
-
-            // Récupère les champs “ressenti veille”, “ressenti rêve” et “événement veille”
-            final prevEvent = dreamsOn.first.tagsBeforeEvent ?? [];
-            final prevFeel = dreamsOn.first.tagsBeforeFeeling ?? [];
-            final dreamFeel = dreamsOn.first.tagsDreamFeeling ?? [];
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 DreamSection(
                   date: date,
-                  tagsBeforeFeeling: prevFeel,
-                  tagsDreamFeeling: dreamFeel,
-                  tagsBeforeEvent: prevEvent,
                 ),
                 ...dreamsOn.map((d) => DreamCard(dream: d)),
               ],
             );
           }).toList(),
-        );
+        ]);
       },
     );
   }

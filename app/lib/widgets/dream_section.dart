@@ -3,16 +3,9 @@ import '../models/app_colors.dart';
 
 class DreamSection extends StatelessWidget {
   final DateTime date;
-  final List<String> tagsBeforeFeeling;
-  final List<String> tagsDreamFeeling;
-  final List<String> tagsBeforeEvent;
-
 
   const DreamSection({
     required this.date,
-    required this.tagsBeforeFeeling,
-    required this.tagsDreamFeeling,
-    required this.tagsBeforeEvent,
     Key? key,
   }) : super(key: key);
 
