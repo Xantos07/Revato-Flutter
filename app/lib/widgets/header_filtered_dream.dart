@@ -2,7 +2,7 @@ import 'package:app/controller/tag_controller.dart';
 import 'package:flutter/material.dart';
 import '../models/tag_model.dart' as models;
 import '../viewmodels/hearder_filter_view_model.dart';
-
+import '../models/app_colors.dart' as models;
 
 class HeaderFilteredDream extends StatefulWidget {
   const HeaderFilteredDream({Key? key}) : super(key: key);
@@ -14,38 +14,28 @@ class HeaderFilteredDream extends StatefulWidget {
 class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
 
   late HeaderFilterViewModel headerFilterViewModel;
+  late List<models.TagModel> allTags;
 
   void initState(){
     super.initState();
     headerFilterViewModel = HeaderFilterViewModel();
+    _loadTags();
+    allTags = [];
+
   }
 
-  Color _getColorForCategory(String category) {
-    switch (category) {
-      case 'beforeEvent':
-        return Colors.green;
-      case 'beforeFeeling':
-        return Colors.purple;
-      case 'dreamFeeling':
-        return Colors.orange;
-      default:
-        return Colors.grey;
+  void _loadTags() async {
+    try {
+      allTags = await headerFilterViewModel.fetchTags();
+      setState(() {});
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur chargement tags initiaux : $e')),
+      );
     }
   }
 
   void _openTagSelector() async {
-
-    late List<models.TagModel> allTags;
-
-    try {
-      allTags = await headerFilterViewModel.fetchTags();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur chargement tags : $e')),
-      );
-      return;
-    }
-
 
     List<models.TagModel> filteredTags = List.from(allTags);
     TextEditingController searchController = TextEditingController();
@@ -83,7 +73,7 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                     final tag = filteredTags[index];
                     return ListTile(
                       title: Text(tag.name,
-                        style: TextStyle(color: _getColorForCategory(tag.category)),),
+                        style: TextStyle(color: models.getColorForCategory(tag.category)),),
 
                       trailing: headerFilterViewModel.selectedTags.contains(tag.name)
                           ? const Icon(Icons.check, color: Colors.deepPurple)
@@ -94,7 +84,6 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                             headerFilterViewModel.addTag(tag.name);
                           });
                         }
-                        Navigator.of(context).pop();
                       },
                     );
                   },
@@ -195,19 +184,25 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
               alignment: WrapAlignment.center,
               spacing: 8,
               runSpacing: 6,
-              children: headerFilterViewModel.selectedTags.map((tag) => Chip(
-                label: Text(tag),
-                backgroundColor: _getColorForCategory(tag).withOpacity(0.2),
-                labelStyle: TextStyle(color: _getColorForCategory(tag)),
-                deleteIconColor: Colors.deepPurple,
-                onDeleted: () {
-                  setState(() {
-                    headerFilterViewModel.removeTag(tag);
-                  });
-                },
-              )).toList(),
+              children: headerFilterViewModel.selectedTags.map((tagName) {
+                final tag = allTags.firstWhere((t) => t.name == tagName, orElse: () => models.TagModel(name: tagName, category: 'default'));
+
+                final color = models.getColorForCategory(tag.category);
+
+                return Chip(
+                  label: Text(tag.name),
+                  backgroundColor: color,
+                  labelStyle: TextStyle(color: Colors.white),
+                  deleteIconColor: Colors.white,
+                  onDeleted: () {
+                    setState(() {
+                      headerFilterViewModel.removeTag(tag.name);
+                    });
+                  },
+                );
+              }).toList(),
             ),
-          ),
+          )
         ],
       ),
     );
