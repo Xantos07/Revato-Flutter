@@ -1,4 +1,4 @@
-import '../models/dream.dart';
+import '../../models/dream.dart';
 
 class DreamFormData {
   DateTime date;

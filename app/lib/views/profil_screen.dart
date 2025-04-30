@@ -1,5 +1,5 @@
-// lib/screens/profile_screen.dart
 import 'package:flutter/material.dart';
+import '../widgets/profile_option_tile.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -15,12 +15,10 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
         child: Column(
           children: [
-            // Avatar + nom
             CircleAvatar(
               radius: 48,
               backgroundColor: Colors.deepPurple.shade200,
-              backgroundImage: AssetImage('assets/profil.png'),
-              //child: Icon(Icons.person, size: 64, color: Colors.white),
+              backgroundImage: const AssetImage('assets/profil.png'),
             ),
             const SizedBox(height: 12),
             const Text(
@@ -32,51 +30,40 @@ class ProfileScreen extends StatelessWidget {
               "jean.dupont@example.com",
               style: TextStyle(color: Colors.grey.shade600),
             ),
-
             const SizedBox(height: 32),
 
-            // Liste de boutons
+            // Menu options
             Expanded(
               child: ListView(
                 children: [
-                  ListTile(
-                    leading: const Icon(Icons.privacy_tip),
-                    title: const Text("Politique de Confidentialité"),
-                    trailing: const Icon(Icons.chevron_right),
+                  ProfileOptionTile(
+                    icon: Icons.privacy_tip,
+                    title: "Politique de Confidentialité",
                     onTap: () {
-                      // TODO: naviguer vers la page PrivacyPolicyScreen
+                      // TODO
                     },
                   ),
-                  const Divider(),
-
-                  ListTile(
-                    leading: const Icon(Icons.rule),
-                    title: const Text("Conditions d’utilisation"),
-                    trailing: const Icon(Icons.chevron_right),
+                  ProfileOptionTile(
+                    icon: Icons.rule,
+                    title: "Conditions d’utilisation",
                     onTap: () {
-                      // TODO: naviguer vers les T&C
+                      // TODO
                     },
                   ),
-                  const Divider(),
-
-                  ListTile(
-                    leading: const Icon(Icons.settings),
-                    title: const Text("Paramètres"),
-                    trailing: const Icon(Icons.chevron_right),
+                  ProfileOptionTile(
+                    icon: Icons.settings,
+                    title: "Paramètres",
                     onTap: () {
-                      // TODO: naviguer vers SettingsScreen
+                      // TODO
                     },
                   ),
-                  const Divider(),
-
-                  ListTile(
-                    leading: const Icon(Icons.logout, color: Colors.red),
-                    title: const Text(
-                      "Déconnexion",
-                      style: TextStyle(color: Colors.red),
-                    ),
+                  ProfileOptionTile(
+                    icon: Icons.logout,
+                    iconColor: Colors.red,
+                    textColor: Colors.red,
+                    title: "Déconnexion",
                     onTap: () {
-                      // TODO: déclencher le logout
+                      // TODO
                     },
                   ),
                 ],

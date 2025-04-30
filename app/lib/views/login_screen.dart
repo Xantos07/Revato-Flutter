@@ -1,6 +1,5 @@
-// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
-import '../controller/login_controller.dart';
+import '../../viewmodels/login_viewmodel.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,32 +9,35 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController    = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final AuthController       _authService           = AuthController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final LoginViewModel viewModel = LoginViewModel();
 
   bool isLoading = false;
 
   void _handleLogin() async {
     setState(() => isLoading = true);
 
-    final success = await _authService.login(
-      emailController.text.trim(),
+    final success = await viewModel.login(
+      emailController.text,
       passwordController.text,
     );
 
     setState(() => isLoading = false);
 
+    final snackBar = SnackBar(
+      content: Text(
+        success
+            ? "✅ Connexion réussie"
+            : "❌ Email ou mot de passe incorrect",
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Connexion réussie")),
-      );
       await Future.delayed(const Duration(milliseconds: 500));
       Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Email ou mot de passe incorrect")),
-      );
     }
   }
 
@@ -50,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   "Se connecter",
                   style: TextStyle(
                     fontSize: 26,
@@ -59,38 +61,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                TextField(
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
+                _buildTextField("Email", emailController, false),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Mot de passe",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
+                _buildTextField("Mot de passe", passwordController, true),
                 const SizedBox(height: 24),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/register');
-                    },
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/register'),
                     child: const Text("Pas encore de compte ? Inscription"),
                   ),
                 ),
@@ -122,6 +100,20 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller, bool obscure) {
+    return TextField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: obscure ? TextInputType.text : TextInputType.emailAddress,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
