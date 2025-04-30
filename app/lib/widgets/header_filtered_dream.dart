@@ -34,69 +34,76 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
       );
     }
   }
-
   void _openTagSelector() async {
-
     List<models.TagModel> filteredTags = List.from(allTags);
     TextEditingController searchController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text("Ajouter un tag"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: searchController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  hintText: 'Rechercher un tag...',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    filteredTags = allTags
-                        .where((t) => t.name.toLowerCase().contains(value.toLowerCase()))
-                        .toList();
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 200,
-                width: double.maxFinite,
-                child: ListView.builder(
-                  itemCount: filteredTags.length,
-                  itemBuilder: (context, index) {
-                    final tag = filteredTags[index];
-                    return ListTile(
-                      title: Text(tag.name,
-                        style: TextStyle(color: models.getColorForCategory(tag.category)),),
-
-                      trailing: headerFilterViewModel.selectedTags.contains(tag.name)
-                          ? const Icon(Icons.check, color: Colors.deepPurple)
-                          : null,
-                      onTap: () {
-                        if (!headerFilterViewModel.selectedTags.contains(tag.name)) {
-                          setState(() {
-                            headerFilterViewModel.addTag(tag.name);
-                          });
-                        }
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text("Ajouter un tag"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: searchController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Rechercher un tag...',
+                    ),
+                    onChanged: (value) {
+                      setModalState(() {
+                        filteredTags = allTags
+                            .where((t) => t.name.toLowerCase().contains(value.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 200,
+                    width: double.maxFinite,
+                    child: ListView.builder(
+                      itemCount: filteredTags.length,
+                      itemBuilder: (context, index) {
+                        final tag = filteredTags[index];
+                        final isSelected = headerFilterViewModel.selectedTags.contains(tag.name);
+                        return ListTile(
+                          title: Text(
+                            tag.name,
+                            style: TextStyle(color: models.getColorForCategory(tag.category)),
+                          ),
+                          trailing: isSelected
+                              ? const Icon(Icons.check, color: Colors.deepPurple)
+                              : null,
+                          onTap: () {
+                            setModalState(() {
+                              if (isSelected) {
+                                headerFilterViewModel.removeTag(tag.name);
+                              } else {
+                                headerFilterViewModel.addTag(tag.name);
+                              }
+                            });
+                            setState(() {}); // pour l'affichage hors modal
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Fermer'),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          ],
+              actions: [
+                TextButton(
+                  child: const Text('Fermer'),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              ],
+            );
+          },
         );
       },
     );
@@ -133,13 +140,6 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                   ),
                   const SizedBox(width: 12),
                   OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      side: const BorderSide(color: Colors.deepPurple),
-                    ),
                     onPressed: () async {
                       final picked = await showDatePicker(
                         context: context,
@@ -153,6 +153,13 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                         });
                       }
                     },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      side: const BorderSide(color: Colors.deepPurple),
+                    ),
                     child: Text(
                       headerFilterViewModel.selectedDate == null
                           ? 'Choisir une date'
@@ -185,14 +192,15 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
               spacing: 8,
               runSpacing: 6,
               children: headerFilterViewModel.selectedTags.map((tagName) {
-                final tag = allTags.firstWhere((t) => t.name == tagName, orElse: () => models.TagModel(name: tagName, category: 'default'));
-
+                final tag = allTags.firstWhere(
+                      (t) => t.name == tagName,
+                  orElse: () => models.TagModel(name: tagName, category: 'default'),
+                );
                 final color = models.getColorForCategory(tag.category);
-
                 return Chip(
                   label: Text(tag.name),
                   backgroundColor: color,
-                  labelStyle: TextStyle(color: Colors.white),
+                  labelStyle: const TextStyle(color: Colors.white),
                   deleteIconColor: Colors.white,
                   onDeleted: () {
                     setState(() {
@@ -202,9 +210,11 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                 );
               }).toList(),
             ),
-          )
+          ),
         ],
       ),
     );
   }
+
+
 }
