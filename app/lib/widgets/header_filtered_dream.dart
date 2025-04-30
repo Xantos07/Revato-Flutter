@@ -20,6 +20,19 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
     headerFilterViewModel = HeaderFilterViewModel();
   }
 
+  Color _getColorForCategory(String category) {
+    switch (category) {
+      case 'beforeEvent':
+        return Colors.green;
+      case 'beforeFeeling':
+        return Colors.purple;
+      case 'dreamFeeling':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
+
   void _openTagSelector() async {
 
     late List<models.TagModel> allTags;
@@ -69,7 +82,9 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                   itemBuilder: (context, index) {
                     final tag = filteredTags[index];
                     return ListTile(
-                      title: Text(tag.name),
+                      title: Text(tag.name,
+                        style: TextStyle(color: _getColorForCategory(tag.category)),),
+
                       trailing: headerFilterViewModel.selectedTags.contains(tag.name)
                           ? const Icon(Icons.check, color: Colors.deepPurple)
                           : null,
@@ -182,7 +197,8 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
               runSpacing: 6,
               children: headerFilterViewModel.selectedTags.map((tag) => Chip(
                 label: Text(tag),
-                backgroundColor: Colors.deepPurple.shade50,
+                backgroundColor: _getColorForCategory(tag).withOpacity(0.2),
+                labelStyle: TextStyle(color: _getColorForCategory(tag)),
                 deleteIconColor: Colors.deepPurple,
                 onDeleted: () {
                   setState(() {
