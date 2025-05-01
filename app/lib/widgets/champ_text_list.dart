@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'text_field.dart';
 
-
-/// Widget de saisie + bouton + + listes de chips scrollable
+/// Widget de saisie + bouton + listes de chips scrollable
 class ChampTextList extends StatefulWidget {
   final String hint;
   final void Function(List<String>)? onListChanged;
+  final List<String> initialList;
 
-  const ChampTextList({Key? key, required this.hint, this.onListChanged}) : super(key: key);
+  const ChampTextList({
+    Key? key,
+    required this.hint,
+    this.onListChanged,
+    this.initialList = const [],
+  }) : super(key: key);
 
   @override
   State<ChampTextList> createState() => _ChampTextListState();
@@ -15,7 +20,13 @@ class ChampTextList extends StatefulWidget {
 
 class _ChampTextListState extends State<ChampTextList> {
   final _controller = TextEditingController();
-  final List<String> _items = [];
+  late List<String> _items;
+
+  @override
+  void initState() {
+    super.initState();
+    _items = List.from(widget.initialList);
+  }
 
   void _ajouterItem() {
     final text = _controller.text.trim();
@@ -27,12 +38,18 @@ class _ChampTextListState extends State<ChampTextList> {
     widget.onListChanged?.call(_items);
   }
 
+  void _supprimerItem(String item) {
+    setState(() {
+      _items.remove(item);
+    });
+    widget.onListChanged?.call(_items);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // On utilise ChampTexte AVEC suffix
         ChampTexte(
           hint: widget.hint,
           isLong: false,
@@ -51,7 +68,6 @@ class _ChampTextListState extends State<ChampTextList> {
             ),
           ),
         ),
-
         if (_items.isNotEmpty) ...[
           const SizedBox(height: 12),
           ConstrainedBox(
@@ -63,10 +79,7 @@ class _ChampTextListState extends State<ChampTextList> {
                 children: _items.map((item) => InputChip(
                   label: Text(item),
                   backgroundColor: Colors.deepPurple.withAlpha((0.1 * 255).round()),
-                  onDeleted: () {
-                    setState(() => _items.remove(item));
-                    widget.onListChanged?.call(_items);
-                  },
+                  onDeleted: () => _supprimerItem(item),
                 )).toList(),
               ),
             ),

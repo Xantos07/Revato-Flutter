@@ -1,5 +1,6 @@
 import '../../models/dream.dart';
 
+//Local a l'app
 class DreamFormData {
   DateTime date;
   String title;
@@ -49,5 +50,17 @@ class DreamFormData {
       tagsBeforeFeeling: tagsBeforeFeeling,
       tagsDreamFeeling: tagsDreamFeeling,
     );
+  }
+
+  void reset() {
+    date = DateTime.now();
+    title = '';
+    actors = [];
+    locations = [];
+    content = '';
+    feeling = '';
+    tagsBeforeEvent = [];
+    tagsBeforeFeeling = [];
+    tagsDreamFeeling = [];
   }
 }

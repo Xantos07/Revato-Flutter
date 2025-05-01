@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 class ChampTexte extends StatelessWidget {
   final String hint;
   final bool isLong;
+  final String? initialValue;
   final TextEditingController? controller;
   final Widget? suffix;
   final void Function(String)? onChanged;
+
+
   const ChampTexte({
     Key? key,
     required this.hint,
     required this.isLong,
+    this.initialValue,
     this.controller,
     this.suffix,
     this.onChanged,
@@ -18,6 +22,10 @@ class ChampTexte extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final effectiveController = controller ?? TextEditingController(text: initialValue ?? '');
+
+
     return Container(
       height: isLong ? 400 : 75,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -37,7 +45,7 @@ class ChampTexte extends StatelessWidget {
           Expanded(
             child: TextField(
               onChanged: onChanged,
-              controller: controller,
+              controller: effectiveController,
               maxLines: isLong ? 14 : 1,
               decoration: InputDecoration(
                 hintText: hint,

@@ -10,9 +10,11 @@ class StepPage extends StatelessWidget {
   final bool isLongText;
   final void Function(String)? onChanged;
   final void Function(List<String>)? onListChanged;
+  final String? initialValue;
+  final List<String> initialList;
 
   const StepPage({super.key, required this.title, required this.hint, this.isList = false,
-    this.isLongText = false,this.onChanged, this.onListChanged});
+    this.isLongText = false,this.onChanged, this.onListChanged, this.initialValue,     this.initialList = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +52,8 @@ class StepPage extends StatelessWidget {
 
               const SizedBox(height: 24),
               isList
-                  ? ChampTextList(hint: hint, onListChanged: onListChanged)
-                  : ChampTexte(hint: hint, isLong: isLongText,onChanged: onChanged),
+                  ? ChampTextList(hint: hint,initialList: initialList, onListChanged: onListChanged)
+                  : ChampTexte(hint: hint, initialValue: initialValue, isLong: isLongText,onChanged: onChanged),
 
             ],
           ),
