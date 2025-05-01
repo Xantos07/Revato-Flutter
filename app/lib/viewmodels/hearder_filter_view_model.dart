@@ -5,7 +5,7 @@ import '../models/tag_model.dart';
 class HeaderFilterViewModel {
   DateTime? selectedDate;
   String filterMode = 'OU';
-  List<String> selectedTags = ['Confiance', 'Joviale'];
+  List<String> selectedTags = [];
 
   final TagController _tagController = TagController();
 

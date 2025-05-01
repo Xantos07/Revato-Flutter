@@ -22,58 +22,50 @@ class _HomeScaffoldState extends State<HomeScaffold> {
     return Scaffold(
       body: _pages[_currentIndex],
 
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurple,
-        child: const Icon(Icons.edit, size: 28),
-        onPressed: () => setState(() => _currentIndex = 1),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
 
       bottomNavigationBar: BottomAppBar(
         elevation: 8,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 6,
-
-        // on ajoute un container pour donner un peu de hauteur + padding
         child: Container(
           height: 60,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               // Profil
-              Expanded(
-                child: IconButton(
-                  iconSize: 28,
-                  icon: Icon(
-                    Icons.person,
-                    color: _currentIndex == 0
-                        ? Colors.deepPurple
-                        : Colors.black54,
-                  ),
-                  onPressed: () => setState(() => _currentIndex = 0),
+              IconButton(
+                iconSize: 28,
+                icon: Icon(
+                  Icons.person,
+                  color: _currentIndex == 0 ? Colors.deepPurple : Colors.black54,
                 ),
+                onPressed: () => setState(() => _currentIndex = 0),
               ),
 
-              // Espace réservé pour le FAB
-              const SizedBox(width: 60),
-
-              // Tâches (ou Journal)
-              Expanded(
-                child: IconButton(
-                  iconSize: 28,
-                  icon: Icon(
-                    Icons.book,
-                    color: _currentIndex == 2
-                        ? Colors.deepPurple
-                        : Colors.black54,
-                  ),
-                  onPressed: () => setState(() => _currentIndex = 2),
+              // Rédaction
+              IconButton(
+                iconSize: 32,
+                icon: Icon(
+                  Icons.edit,
+                  color: _currentIndex == 1 ? Colors.deepPurple : Colors.black54,
                 ),
+                onPressed: () => setState(() => _currentIndex = 1),
+              ),
+
+              // Liste
+              IconButton(
+                iconSize: 28,
+                icon: Icon(
+                  Icons.book,
+                  color: _currentIndex == 2 ? Colors.deepPurple : Colors.black54,
+                ),
+                onPressed: () => setState(() => _currentIndex = 2),
               ),
             ],
           ),
         ),
       ),
+
     );
   }
 }
