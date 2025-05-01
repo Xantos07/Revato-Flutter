@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../controller/register_controller.dart';
+import '../../viewmodels/register_viewmodel.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,32 +9,33 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final AuthService _authService = AuthService();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final RegisterViewModel viewModel = RegisterViewModel();
 
   bool isLoading = false;
 
   void _handleRegister() async {
     setState(() => isLoading = true);
 
-    final success = await _authService.register(
-      emailController.text.trim(),
+    final success = await viewModel.register(
+      emailController.text,
       passwordController.text,
     );
 
     setState(() => isLoading = false);
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(success
+            ? "🎉 Inscription réussie"
+            : "❌ Erreur d'inscription"),
+      ),
+    );
+
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("🎉 Inscription réussie")),
-      );
       await Future.delayed(const Duration(milliseconds: 500));
       Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Erreur d'inscription")),
-      );
     }
   }
 
@@ -49,7 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   "Créer un compte",
                   style: TextStyle(
                     fontSize: 26,
@@ -58,30 +59,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
+                _buildTextField("Email", emailController, false),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Mot de passe",
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
+                _buildTextField("Mot de passe", passwordController, true),
                 const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
@@ -95,9 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     child: isLoading
-                        ? const CircularProgressIndicator(
-                      color: Colors.white,
-                    )
+                        ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                       "S'inscrire",
                       style: TextStyle(
@@ -112,6 +90,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller, bool obscure) {
+    return TextField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: obscure ? TextInputType.text : TextInputType.emailAddress,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }

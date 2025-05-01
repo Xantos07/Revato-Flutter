@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/dream.dart';
-import '../models/app_colors.dart'; // si tu utilises des couleurs custom
+import '../models/app_colors.dart';
 
 class DreamCard extends StatelessWidget {
   final Dream dream;
   const DreamCard({required this.dream, Key? key}) : super(key: key);
+
+  List<Widget> _buildChips(List<String> tags, Color color) {
+    return tags.map((tag) => Chip(
+      label: Text(tag),
+      backgroundColor: color,
+      labelStyle: const TextStyle(color: Colors.white),
+    )).toList();
+  }
 
   @override
   Widget build(BuildContext ctx) {
@@ -30,21 +38,9 @@ class DreamCard extends StatelessWidget {
               spacing: 6,
               runSpacing: 4,
               children: [
-                ...dream.tagsBeforeEvent.map((tag) => Chip(
-                  label: Text(tag),
-                  backgroundColor: AppColors.previousEvent,
-                  labelStyle: TextStyle(color: Colors.white),
-                )),
-                ...dream.tagsBeforeFeeling.map((tag) => Chip(
-                  label: Text(tag),
-                  backgroundColor: AppColors.previousFeeling,
-                  labelStyle: TextStyle(color: Colors.white),
-                )),
-                ...dream.tagsDreamFeeling.map((tag) => Chip(
-                  label: Text(tag),
-                  backgroundColor: AppColors.dreamFeeling,
-                  labelStyle: TextStyle(color: Colors.white),
-                )),
+                ..._buildChips(dream.tagsBeforeEvent, AppColors.previousEvent),
+                ..._buildChips(dream.tagsBeforeFeeling, AppColors.previousFeeling),
+                ..._buildChips(dream.tagsDreamFeeling, AppColors.dreamFeeling),
               ],
             ),
 

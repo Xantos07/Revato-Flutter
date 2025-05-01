@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'widgets/SplashScreen.dart';
 import '../views/register_screen.dart';
 import '../views/login_screen.dart';
-import 'home_scaffold.dart';
+import 'views/home_scaffold.dart';
 
 class CarrouselReveApp extends StatelessWidget {
   const CarrouselReveApp({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../viewmodels/splash_viewmodel.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -7,10 +7,9 @@ class SplashScreen extends StatefulWidget {
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-
 class _SplashScreenState extends State<SplashScreen> {
-  final _storage = FlutterSecureStorage();
 
+  final SplashViewModel _splashViewModel = SplashViewModel();
   @override
   void initState() {
     super.initState();
@@ -19,13 +18,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkAuth() async {
     await Future.delayed(const Duration(seconds: 2));
-    final token = await _storage.read(key: 'jwt');
+    final isLoggedIn = await _splashViewModel.isAuthenticated();
 
-    if (token != null) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/login');
-    }
+    if (!mounted) return;
+
+    Navigator.pushReplacementNamed(context, isLoggedIn ? '/home' : '/login');
   }
 
   @override

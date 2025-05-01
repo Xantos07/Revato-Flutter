@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:app/models/dream.dart';
 import '../../widgets/header_dream.dart';
 import '../../widgets/step_page.dart';
-import '../dream_form_data.dart';
-import '../../controller/dream_controller.dart';
+import '../../viewmodels/redaction_viewmodel.dart';
 
 class RedactionScreen extends StatefulWidget {
   const RedactionScreen({super.key});
@@ -14,23 +12,13 @@ class RedactionScreen extends StatefulWidget {
 
 class _RedactionScreenState extends State<RedactionScreen> {
   final PageController _pageController = PageController();
+  final RedactionViewModel viewModel = RedactionViewModel();
+
   int _pageIndex = 0;
   final int totalPages = 8;
 
-  final DreamFormData formData = DreamFormData(
-    date: DateTime.now(),
-    title: '',
-    actors: [],
-    locations: [],
-    content: '',
-    feeling: '',
-    tagsBeforeEvent: [],
-    tagsBeforeFeeling: [],
-    tagsDreamFeeling: [],
-  );
-
   void _nextPage() async {
-    print("📝 Données actuelles : ${formData.toJson()}");
+    print("📝 Données actuelles : ${viewModel.formData.toJson()}");
 
     if (_pageIndex < totalPages - 1) {
       _pageController.nextPage(
@@ -38,28 +26,24 @@ class _RedactionScreenState extends State<RedactionScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      final dream = formData.toDream();
-      final success = await DreamController().createDream(dream);
+      final success = await viewModel.submitDream();
 
-      if (success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("✅ Rêve envoyé avec succès !")),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("❌ Erreur lors de l'envoi.")),
-          );
-        }
-      }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success
+                ? "✅ Rêve envoyé avec succès !"
+                : "❌ Erreur lors de l'envoi.",
+          ),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Espace pour ne pas être masqué par la navBar/FAB
     const bottomPadding = 40.0;
 
     return SafeArea(
@@ -76,57 +60,53 @@ class _RedactionScreenState extends State<RedactionScreen> {
                   StepPage(
                     title: "Titre du rêve",
                     hint: "Ex : Le château volant",
-                    onChanged: (v) => formData.title = v,
+                    onChanged: (v) => viewModel.formData.title = v,
                   ),
                   StepPage(
                     title: "Acteurs",
                     isList: true,
                     hint: "Acteur",
-                    onListChanged: (v) => formData.actors = v,
+                    onListChanged: (v) => viewModel.formData.actors = v,
                   ),
                   StepPage(
                     title: "Lieux",
                     isList: true,
                     hint: "Lieux",
-                    onListChanged: (v) => formData.locations = v,
+                    onListChanged: (v) => viewModel.formData.locations = v,
                   ),
                   StepPage(
                     title: "Notation du rêve",
-                    hint:
-                    "Ex : Tout commença lorsque je me retrouve dans ma maison à côté de mon chien...",
                     isLongText: true,
-                    onChanged: (v) => formData.content = v,
+                    hint: "Ex : Tout commença lorsque je me retrouve dans ma maison à côté de mon chien...",
+                    onChanged: (v) => viewModel.formData.content = v,
                   ),
                   StepPage(
                     title: "Ressenti du rêve",
-                    hint:
-                    "Ex : Le rêve commença très bien mais j'ai vite eu peur",
                     isLongText: true,
-                    onChanged: (v) => formData.feeling = v,
+                    hint: "Ex : Le rêve commença très bien mais j'ai vite eu peur",
+                    onChanged: (v) => viewModel.formData.feeling = v,
                   ),
                   StepPage(
                     title: "Tag événementiel de la veille",
                     isList: true,
                     hint: "Tag événementiel de la veille",
-                    onListChanged: (v) => formData.tagsBeforeEvent = v,
+                    onListChanged: (v) => viewModel.formData.tagsBeforeEvent = v,
                   ),
                   StepPage(
                     title: "Tag ressenti la veille",
                     isList: true,
                     hint: "Tag ressenti la veille",
-                    onListChanged: (v) => formData.tagsBeforeFeeling = v,
+                    onListChanged: (v) => viewModel.formData.tagsBeforeFeeling = v,
                   ),
                   StepPage(
                     title: "Tag ressenti dans le rêve",
                     isList: true,
                     hint: "Tag ressenti dans le rêve",
-                    onListChanged: (v) => formData.tagsDreamFeeling = v,
+                    onListChanged: (v) => viewModel.formData.tagsDreamFeeling = v,
                   ),
                 ],
               ),
             ),
-
-            // Bouton "Suivant" bien au-dessus du FAB / navBar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ConstrainedBox(

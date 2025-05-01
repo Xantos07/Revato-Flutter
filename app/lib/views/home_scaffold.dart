@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'views/redaction_screen.dart';
-import 'views/profil_screen.dart';
-import 'widgets/dream_list.dart';
+import 'redaction_screen.dart';
+import 'profil_screen.dart';
+import 'dream_list.dart';
 
 class HomeScaffold extends StatefulWidget {
   const HomeScaffold({Key? key}) : super(key: key);

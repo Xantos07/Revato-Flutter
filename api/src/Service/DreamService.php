@@ -61,6 +61,7 @@ class DreamService
             $tag = $this->em->getRepository(Tag::class)->findOneBy(['name' => $name]) ?? new Tag();
             if (!$tag->getId()) {
                 $tag->setName($name);
+                $tag->setCategory('beforeEvent');
                 $this->em->persist($tag);
             }
             $dream->addTagBeforeEvent($tag);
@@ -70,6 +71,7 @@ class DreamService
             $tag = $this->em->getRepository(Tag::class)->findOneBy(['name' => $name]) ?? new Tag();
             if (!$tag->getId()) {
                 $tag->setName($name);
+                $tag->setCategory('beforeFeeling');
                 $this->em->persist($tag);
             }
             $dream->addTagBeforeFeeling($tag);
@@ -79,6 +81,7 @@ class DreamService
             $tag = $this->em->getRepository(Tag::class)->findOneBy(['name' => $name]) ?? new Tag();
             if (!$tag->getId()) {
                 $tag->setName($name);
+                $tag->setCategory('dreamFeeling');
                 $this->em->persist($tag);
             }
             $dream->addTagDreamFeeling($tag);

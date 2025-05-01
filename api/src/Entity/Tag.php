@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TagRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TagRepository::class)]
 class Tag
@@ -13,8 +14,13 @@ class Tag
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Groups(['tag:read'])]
     private ?string $name = null;
+
+    #[ORM\Column(length: 50)]
+    #[Groups(['tag:read'])]
+    private ?string $category = null;
 
     public function getId(): ?int
     {
@@ -30,6 +36,18 @@ class Tag
     {
         $this->name = $name;
 
+        return $this;
+    }
+
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?string $category): self
+    {
+        $this->category = $category;
         return $this;
     }
 }

@@ -23,6 +23,7 @@ class Dream {
 
 
   Map<String, dynamic> toJson() => {
+    'date': date.toIso8601String(),
     'title': title,
     'content': content,
     'feeling': feeling,
