@@ -6,6 +6,7 @@ import '../../viewmodels/dream_list_viewmodel.dart';
 import '../widgets/dream_card.dart';
 import '../widgets/dream_section.dart';
 import '../widgets/header_filtered_dream.dart';
+import '../widgets/page_header.dart';
 
 class DreamList extends StatefulWidget {
   const DreamList({Key? key}) : super(key: key);
@@ -43,22 +44,8 @@ class _DreamListState extends State<DreamList> {
 
         return ListView(
           children: [
-            // ✅ EN-TÊTE "Liste des rêves"
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              color: Colors.deepPurple,
-              child: const Center(
-                child: Text(
-                  'Liste des rêves',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+
+            PageHeader(title: 'Liste des rêves'),
 
             // 🔍  filtre
             const HeaderFilteredDream(),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/dream.dart';
 import '../models/app_colors.dart';
 import '../widgets/highlight_tags_in_content.dart';
+import '../widgets/page_header.dart';
 
 class DreamDetailPage extends StatelessWidget {
   final Dream dream;
@@ -25,27 +26,27 @@ class DreamDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(dream.title)),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.arrow_back),
+              label: const Text("Retour"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                minimumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Bloc violet titre + date
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              decoration: const BoxDecoration(
-                color: Colors.deepPurple,
-              ),
-              child: Column(
-                children: [
-                  Text(dream.title,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                  Text(dream.date.toLocal().toString(),
-                      style: const TextStyle(color: Colors.white70)),
-                ],
-              ),
-            ),
-
+            PageHeader(title: dream.title),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
