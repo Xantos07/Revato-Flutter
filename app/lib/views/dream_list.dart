@@ -43,7 +43,27 @@ class _DreamListState extends State<DreamList> {
 
         return ListView(
           children: [
+            // ✅ EN-TÊTE "Liste des rêves"
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              color: Colors.deepPurple,
+              child: const Center(
+                child: Text(
+                  'Liste des rêves',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            // 🔍  filtre
             const HeaderFilteredDream(),
+
+            // 📆  rêves groupés par date
             ...grouped.entries.map((entry) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

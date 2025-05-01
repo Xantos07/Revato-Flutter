@@ -6,6 +6,8 @@ class HeaderDream extends StatelessWidget {
 
   const HeaderDream({super.key, required this.currentPage, required this.totalPages});
 
+
+  /// Peut etre le rendre generique car les 4 pages vont en avoir
   @override
   Widget build(BuildContext context) {
     return Container(
