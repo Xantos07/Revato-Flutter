@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/header_dream.dart';
+import '../../widgets/page_header.dart';
 import '../../widgets/step_page.dart';
 import '../../viewmodels/redaction_viewmodel.dart';
 
@@ -51,7 +51,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
         padding: const EdgeInsets.only(bottom: bottomPadding),
         child: Column(
           children: [
-            HeaderDream(currentPage: _pageIndex, totalPages: totalPages),
+            PageHeader(title: "Rédiger votre rêve ✨", currentPage: _pageIndex, totalPages: totalPages,),
             Expanded(
               child: PageView(
                 controller: _pageController,

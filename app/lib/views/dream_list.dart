@@ -6,6 +6,7 @@ import '../../viewmodels/dream_list_viewmodel.dart';
 import '../widgets/dream_card.dart';
 import '../widgets/dream_section.dart';
 import '../widgets/header_filtered_dream.dart';
+import '../widgets/page_header.dart';
 
 class DreamList extends StatefulWidget {
   const DreamList({Key? key}) : super(key: key);
@@ -43,7 +44,13 @@ class _DreamListState extends State<DreamList> {
 
         return ListView(
           children: [
+
+            PageHeader(title: 'Liste des rêves'),
+
+            // 🔍  filtre
             const HeaderFilteredDream(),
+
+            // 📆  rêves groupés par date
             ...grouped.entries.map((entry) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

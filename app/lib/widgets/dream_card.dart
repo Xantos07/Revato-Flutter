@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/dream.dart';
 import '../models/app_colors.dart';
+import '../views/dream_detail_page.dart';
 
 class DreamCard extends StatelessWidget {
   final Dream dream;
@@ -16,7 +17,18 @@ class DreamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext ctx) {
-    return Card(
+
+    return InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.push(
+            ctx,
+            MaterialPageRoute(
+              builder: (_) => DreamDetailPage(dream: dream),
+            ),
+          );
+        },
+    child: Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -55,6 +67,6 @@ class DreamCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
