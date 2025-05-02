@@ -46,6 +46,42 @@ class DreamDetailPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // Bloc contenu + tags
+            const SizedBox(height: 16),
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+              ),
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.black87, fontSize: 15, height: 1.5),
+                  children: highlightTagsInContent(dream.content, dream),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                      child:
+                      Text(dream.feeling, style: const TextStyle(fontStyle: FontStyle.italic)),
+                  ),
+                ],
+              ),
+            ),
+
             PageHeader(title: dream.title),
             const SizedBox(height: 16),
             Padding(
@@ -89,43 +125,6 @@ class DreamDetailPage extends StatelessWidget {
                         labelStyle: TextStyle(color: AppColors.dreamFeeling),
                       )),
                     ],
-                  ),
-                ],
-              ),
-            ),
-
-
-            // Bloc contenu + tags
-            const SizedBox(height: 16),
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
-              ),
-              child: RichText(
-                text: TextSpan(
-                  style: const TextStyle(color: Colors.black87, fontSize: 15, height: 1.5),
-                  children: highlightTagsInContent(dream.content, dream),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.deepPurple.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                      child:
-                      Text(dream.feeling, style: const TextStyle(fontStyle: FontStyle.italic)),
                   ),
                 ],
               ),

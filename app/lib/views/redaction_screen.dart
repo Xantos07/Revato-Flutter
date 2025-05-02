@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/step_page.dart';
 import '../../viewmodels/redaction_viewmodel.dart';
+import '../models/app_colors.dart';
 import '../models/dream.dart';
 class RedactionScreen extends StatefulWidget {
   const RedactionScreen({super.key});
@@ -51,7 +52,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bottomPadding = 40.0;
+    const bottomPadding = 10.0;
 
     return SafeArea(
       child: Padding(
@@ -66,6 +67,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
                 children: [
                   StepPage(
                     title: "Titre du rêve",
+                    isList: false,
                     hint: "Ex : Le château volant",
                     initialValue: viewModel.formData.title,
                     onChanged: (v) => viewModel.formData.title = v,
@@ -104,6 +106,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
                     hint: "Tag événementiel de la veille",
                     initialList: viewModel.formData.tagsBeforeEvent,
                     onListChanged: (v) => viewModel.formData.tagsBeforeEvent = v,
+                    chipColor: AppColors.previousEvent,
                   ),
                   StepPage(
                     title: "Tag ressenti la veille",
@@ -111,6 +114,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
                     hint: "Tag ressenti la veille",
                     initialList: viewModel.formData.tagsBeforeFeeling,
                     onListChanged: (v) => viewModel.formData.tagsBeforeFeeling = v,
+                    chipColor: AppColors.previousFeeling,
                   ),
                   StepPage(
                     title: "Tag ressenti dans le rêve",
@@ -118,6 +122,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
                     hint: "Tag ressenti dans le rêve",
                     initialList: viewModel.formData.tagsDreamFeeling,
                     onListChanged: (v) => viewModel.formData.tagsDreamFeeling = v,
+                    chipColor: AppColors.dreamFeeling,
                   ),
                 ],
               ),

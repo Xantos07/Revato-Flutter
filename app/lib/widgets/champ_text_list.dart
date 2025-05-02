@@ -6,12 +6,15 @@ class ChampTextList extends StatefulWidget {
   final String hint;
   final void Function(List<String>)? onListChanged;
   final List<String> initialList;
+  final Color chipColor;
 
   const ChampTextList({
     Key? key,
     required this.hint,
     this.onListChanged,
     this.initialList = const [],
+    this.chipColor = Colors.deepPurple,
+
   }) : super(key: key);
 
   @override
@@ -56,8 +59,8 @@ class _ChampTextListState extends State<ChampTextList> {
           controller: _controller,
           suffix: Container(
             margin: const EdgeInsets.only(left: 8),
-            decoration: const BoxDecoration(
-              color: Colors.deepPurple,
+            decoration: BoxDecoration(
+              color: widget.chipColor,
               shape: BoxShape.circle,
             ),
             child: IconButton(
@@ -76,9 +79,14 @@ class _ChampTextListState extends State<ChampTextList> {
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: _items.map((item) => InputChip(
-                  label: Text(item),
-                  backgroundColor: Colors.deepPurple.withAlpha((0.1 * 255).round()),
+                children: _items.map((item) => Chip(
+                  label: Text(
+                    item,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: widget.chipColor,
+                  deleteIconColor: Colors.white,
+                  labelStyle: const TextStyle(color: Colors.white),
                   onDeleted: () => _supprimerItem(item),
                 )).toList(),
               ),
