@@ -1,8 +1,8 @@
 // lib/views/dream_list.dart
 
 import 'package:flutter/material.dart';
-import '../../models/dream.dart';
-import '../../viewmodels/dream_list_viewmodel.dart';
+import '../models/dream.dart';
+import '../viewmodels/dream_list_viewmodel.dart';
 import '../widgets/dream_card.dart';
 import '../widgets/dream_section.dart';
 import '../widgets/header_filtered_dream.dart';
@@ -17,12 +17,43 @@ class DreamList extends StatefulWidget {
 
 class _DreamListState extends State<DreamList> {
   final DreamListViewModel _viewModel = DreamListViewModel();
+
   late Future<Map<DateTime, List<Dream>>> _groupedDreams;
+
+  List<String> _activeTags = [];
+  DateTime? _activeDate;
 
   @override
   void initState() {
     super.initState();
-    _groupedDreams = _viewModel.getGroupedDreams();
+    _groupedDreams = _loadFilteredDreams();
+  }
+
+  Future<Map<DateTime, List<Dream>>> _loadFilteredDreams() async {
+    final allDreams = await _viewModel.getAllDreams();
+
+    final filtered = allDreams.where((dream) {
+      final tagMatch = _activeTags.isEmpty ||
+          _activeTags.any((tag) =>
+          dream.tagsBeforeEvent.contains(tag) ||
+              dream.tagsBeforeFeeling.contains(tag) ||
+              dream.tagsDreamFeeling.contains(tag));
+
+      final dateMatch = _activeDate == null ||
+          (dream.date.year == _activeDate!.year &&
+              dream.date.month == _activeDate!.month &&
+              dream.date.day == _activeDate!.day);
+
+      return tagMatch && dateMatch;
+    });
+
+    final Map<DateTime, List<Dream>> grouped = {};
+    for (final d in filtered) {
+      final dateKey = DateTime(d.date.year, d.date.month, d.date.day);
+      grouped.putIfAbsent(dateKey, () => []).add(d);
+    }
+
+    return grouped;
   }
 
   @override
@@ -38,19 +69,25 @@ class _DreamListState extends State<DreamList> {
         }
 
         final grouped = snapshot.data ?? {};
-        if (grouped.isEmpty) {
-          return const Center(child: Text('Aucun rêve trouvé.'));
-        }
+        //if (grouped.isEmpty) {return const Center(child: Text('Aucun rêve trouvé.'));}
 
         return ListView(
           children: [
-
             PageHeader(title: 'Liste des rêves'),
 
-            // 🔍  filtre
-            const HeaderFilteredDream(),
+            HeaderFilteredDream(
+              selectedTags: _activeTags,
+              selectedDate: _activeDate,
+              onFilterChanged: (tags, date) {
+                setState(() {
+                  _activeTags = tags;
+                  _activeDate = date;
+                  _groupedDreams = _loadFilteredDreams();
+                });
+              },
+            ),
 
-            // 📆  rêves groupés par date
+
             ...grouped.entries.map((entry) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
