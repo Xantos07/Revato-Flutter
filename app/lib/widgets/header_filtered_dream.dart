@@ -33,16 +33,33 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
         SnackBar(content: Text('Erreur chargement tags initiaux : $e')),
       );
     }
+
+    print('📦 Catégories récupérées : ${allTags.map((t) => t.name).toSet()}');
   }
   void _openTagSelector() async {
-    List<models.TagModel> filteredTags = List.from(allTags);
+
+    String selectedCategory = 'beforeEvent';
     TextEditingController searchController = TextEditingController();
+
+    final categories = {
+      'beforeEvent': 'Événement',
+      'beforeFeeling': 'Ressenti veille',
+      'dreamFeeling': 'Ressenti rêve',
+    };
 
     showDialog(
       context: context,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setModalState) {
+            // 🔁 Recalcul ici à chaque rebuild
+            final tagsByCategory = {
+              for (var key in categories.keys)
+                key: allTags.where((t) => t.category == key).toList()
+            };
+
+            final visibleTags = tagsByCategory[selectedCategory]!;
+
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: const Text("Ajouter un tag"),
@@ -56,30 +73,49 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                       hintText: 'Rechercher un tag...',
                     ),
                     onChanged: (value) {
-                      setModalState(() {
-                        filteredTags = allTags
-                            .where((t) => t.name.toLowerCase().contains(value.toLowerCase()))
-                            .toList();
-                      });
+                      setModalState(() {});
                     },
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    children: categories.entries.map((entry) {
+                      final isSelected = selectedCategory == entry.key;
+                      return ChoiceChip(
+                        label: Text(entry.value),
+                        selected: isSelected,
+                        selectedColor: Colors.deepPurple,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black87,
+                        ),
+                        onSelected: (_) {
+                          setModalState(() {
+                            selectedCategory = entry.key;
+                            // 💬 Impression des tags associés à cette catégorie
+                            final newVisibleTags = allTags
+                                .where((t) => t.category == selectedCategory)
+                                .map((t) => t.name)
+                                .toList();
+
+                            print('🔍 Tags pour $selectedCategory : $newVisibleTags');
+                          });
+                        },
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 200,
                     width: double.maxFinite,
-                    child: ListView.builder(
-                      itemCount: filteredTags.length,
-                      itemBuilder: (context, index) {
-                        final tag = filteredTags[index];
+                    child: ListView(
+                      children: visibleTags.map((tag) {
                         final isSelected = headerFilterViewModel.selectedTags.contains(tag.name);
                         return ListTile(
                           title: Text(
                             tag.name,
                             style: TextStyle(color: models.getColorForCategory(tag.category)),
                           ),
-                          trailing: isSelected
-                              ? const Icon(Icons.check, color: Colors.deepPurple)
-                              : null,
+                          trailing: isSelected ? const Icon(Icons.check, color: Colors.deepPurple) : null,
                           onTap: () {
                             setModalState(() {
                               if (isSelected) {
@@ -88,10 +124,10 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                                 headerFilterViewModel.addTag(tag.name);
                               }
                             });
-                            setState(() {}); // pour l'affichage hors modal
+                            setState(() {}); // pour l'extérieur
                           },
                         );
-                      },
+                      }).toList(),
                     ),
                   ),
                 ],
@@ -108,6 +144,7 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Champ texte stylé, avec option de suffix widget (bouton, icône…)
 class ChampTexte extends StatelessWidget {
   final String hint;
   final bool isLong;
@@ -8,7 +7,6 @@ class ChampTexte extends StatelessWidget {
   final TextEditingController? controller;
   final Widget? suffix;
   final void Function(String)? onChanged;
-
 
   const ChampTexte({
     Key? key,
@@ -22,39 +20,53 @@ class ChampTexte extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final effectiveController = controller ?? TextEditingController(text: initialValue ?? '');
 
-
     return Container(
-      height: isLong ? 400 : 75,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: isLong ? BorderRadius.circular(16) : BorderRadius.circular(50),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha((0.08 * 255).round()),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 6,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Row(
+        crossAxisAlignment: isLong ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: TextField(
+            child: isLong
+                ? ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 150, maxHeight: 300),
+              child: Scrollbar(
+                child: SingleChildScrollView(
+                  child: TextField(
+                    onChanged: onChanged,
+                    controller: effectiveController,
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      hintText: hint,
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+            )
+                : TextField(
               onChanged: onChanged,
               controller: effectiveController,
-              maxLines: isLong ? 14 : 1,
+              maxLines: 1,
               decoration: InputDecoration(
                 hintText: hint,
                 border: InputBorder.none,
               ),
             ),
           ),
-
-          // Si on a passé un suffix, on l'affiche dedans :
           if (suffix != null) suffix!,
         ],
       ),

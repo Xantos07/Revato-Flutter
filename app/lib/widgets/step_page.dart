@@ -53,8 +53,28 @@ class StepPage extends StatelessWidget {
 
               const SizedBox(height: 24),
               isList
-                  ? ChampTextList(hint: hint,initialList: initialList, onListChanged: onListChanged,   chipColor: chipColor ?? Colors.deepPurple)
-                  : ChampTexte(hint: hint, initialValue: initialValue, isLong: isLongText,onChanged: onChanged),
+                  ? ChampTextList(
+                hint: hint,
+                onListChanged: onListChanged,
+                initialList: initialList,
+                  chipColor: chipColor ?? Colors.deepPurple
+              )
+                  : isLongText
+                  ? Expanded(
+                child: ChampTexte(
+                  hint: hint,
+                  initialValue: initialValue,
+                  isLong: true,
+                  onChanged: onChanged,
+                ),
+              )
+                  : ChampTexte(
+                hint: hint,
+                initialValue: initialValue,
+                isLong: false,
+                onChanged: onChanged,
+              ),
+
 
             ],
           ),
