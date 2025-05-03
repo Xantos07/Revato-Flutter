@@ -5,7 +5,17 @@ import '../viewmodels/hearder_filter_view_model.dart';
 import '../models/app_colors.dart' as models;
 
 class HeaderFilteredDream extends StatefulWidget {
-  const HeaderFilteredDream({Key? key}) : super(key: key);
+  final List<String> selectedTags;
+  final DateTime? selectedDate;
+  final Function(List<String> tags, DateTime? date) onFilterChanged;
+
+  const HeaderFilteredDream({
+    Key? key,
+    required this.selectedTags,
+    required this.selectedDate,
+    required this.onFilterChanged,
+  }) : super(key: key);
+
 
   @override
   State<HeaderFilteredDream> createState() => _HeaderFilteredDreamState();
@@ -16,13 +26,18 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
   late HeaderFilterViewModel headerFilterViewModel;
   late List<models.TagModel> allTags;
 
-  void initState(){
+
+  @override
+  void initState() {
     super.initState();
     headerFilterViewModel = HeaderFilterViewModel();
     _loadTags();
     allTags = [];
 
+    headerFilterViewModel.selectedTags = List.from(widget.selectedTags);
+    headerFilterViewModel.selectedDate = widget.selectedDate;
   }
+
 
   void _loadTags() async {
     try {
@@ -79,30 +94,35 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
                     children: categories.entries.map((entry) {
                       final isSelected = selectedCategory == entry.key;
                       return ChoiceChip(
-                        label: Text(entry.value),
+                        label: SizedBox(
+                          width: 120, // fixe pour uniformiser visuellement
+                          child: Center(child: Text(entry.value)),
+                        ),
                         selected: isSelected,
                         selectedColor: Colors.deepPurple,
                         labelStyle: TextStyle(
                           color: isSelected ? Colors.white : Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(color: Colors.deepPurple.withOpacity(0.3)),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         onSelected: (_) {
                           setModalState(() {
                             selectedCategory = entry.key;
-                            // 💬 Impression des tags associés à cette catégorie
-                            final newVisibleTags = allTags
-                                .where((t) => t.category == selectedCategory)
-                                .map((t) => t.name)
-                                .toList();
-
-                            print('🔍 Tags pour $selectedCategory : $newVisibleTags');
                           });
                         },
                       );
                     }).toList(),
                   ),
+
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 200,
@@ -124,20 +144,28 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                                 headerFilterViewModel.addTag(tag.name);
                               }
                             });
-                            setState(() {}); // pour l'extérieur
                           },
+
+
                         );
                       }).toList(),
                     ),
                   ),
                 ],
               ),
-              actions: [
-                TextButton(
-                  child: const Text('Fermer'),
-                  onPressed: () => Navigator.of(context).pop(),
-                )
-              ],
+                actions: [
+                  TextButton(
+                    child: const Text('Fermer'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      widget.onFilterChanged(
+                        headerFilterViewModel.selectedTags,
+                        headerFilterViewModel.selectedDate,
+                      );
+                    },
+                  )
+                ]
+
             );
           },
         );
@@ -187,6 +215,10 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                       if (picked != null) {
                         setState(() {
                           headerFilterViewModel.updateDate(picked);
+                          widget.onFilterChanged?.call(
+                            headerFilterViewModel.selectedTags,
+                            headerFilterViewModel.selectedDate,
+                          );
                         });
                       }
                     },
@@ -242,6 +274,10 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                   onDeleted: () {
                     setState(() {
                       headerFilterViewModel.removeTag(tag.name);
+                      widget.onFilterChanged?.call(
+                        headerFilterViewModel.selectedTags,
+                        headerFilterViewModel.selectedDate,
+                      );
                     });
                   },
                 );

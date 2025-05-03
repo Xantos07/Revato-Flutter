@@ -1,14 +1,42 @@
-// lib/viewmodels/dream_list_viewmodel.dart
-
+import 'package:flutter/material.dart'; // Pour DateUtils
 import '../../models/dream.dart';
 import '../../controller/dream_controller.dart';
 
 class DreamListViewModel {
   final DreamController _controller = DreamController();
 
-  Future<Map<DateTime, List<Dream>>> getGroupedDreams() async {
+  List<Dream>? _cachedDreams;
+
+  Future<List<Dream>> _fetchAllDreams() async {
+    if (_cachedDreams != null) return _cachedDreams!;
     final dreams = await _controller.getDreams();
-    return _groupByDate(dreams);
+    _cachedDreams = dreams;
+    return dreams;
+  }
+
+  Future<List<Dream>> getAllDreams() async {
+    return _fetchAllDreams();
+  }
+
+  Future<Map<DateTime, List<Dream>>> getGroupedDreams({
+    List<String>? selectedTags,
+    DateTime? selectedDate,
+  }) async {
+    final dreams = await _fetchAllDreams();
+
+    final filtered = dreams.where((dream) {
+      final matchTags = selectedTags == null || selectedTags.every((tag) =>
+      dream.tagsBeforeEvent.contains(tag) ||
+          dream.tagsBeforeFeeling.contains(tag) ||
+          dream.tagsDreamFeeling.contains(tag));
+
+      final matchDate = selectedDate == null ||
+          DateUtils.isSameDay(dream.date, selectedDate);
+
+      return matchTags && matchDate;
+    }).toList();
+
+    return _groupByDate(filtered);
   }
 
   Map<DateTime, List<Dream>> _groupByDate(List<Dream> dreams) {
