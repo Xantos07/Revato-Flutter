@@ -8,35 +8,26 @@ use PHPUnit\Framework\TestCase;
 use App\Service\RegistrationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ConstraintViolationList;
-
+use Symfony\Component\Validator\Validation;
 
 class RegistrationServiceTest extends TestCase
 {
-    public function testRegisterFailsIfEmailAlreadyExists()
+    public function testRegisterFailsEmailAlreadyExists()
     {
         $email = 'test@example.com';
-        $password = '1234';
+        $password = 'Str0ngP@ssw0rd!';
 
-        // Mock repository
         $userMock = $this->createMock(User::class);
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
-            ->method('findOneBy')
-            ->willReturn($userMock);
+        $repository->expects($this->once())->method('findOneBy')->willReturn($userMock);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
-
+        $em->expects($this->once())->method('getRepository')->willReturn($repository);
 
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->once())->method('validate')->willReturn(new ConstraintViolationList());
+
+        $validator = Validation::createValidator();
 
         $service = new RegistrationService($em, $hasher, $validator);
 
@@ -46,21 +37,21 @@ class RegistrationServiceTest extends TestCase
         $this->assertEquals(409, $result['code']);
     }
 
-    public function testRegisterFailsIfEmailInvalid()
+    /**
+     * @dataProvider provideInvalidEmailFormats
+     */
+
+    public function testRegisterFailsEmailFormatIsInvalid(string $email)
     {
-        $email = 'pas-un-email';
-        $password = '1234';
+        $password = 'Str0ngP@ssw0rd!';
 
         $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->never())->method('persist');
 
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
+        $hasher->expects($this->never())->method('hashPassword');
 
-        // Simule un échec de validation
-        $violationList = new ConstraintViolationList([new ConstraintViolation(
-            'Invalid email', null, [], '', 'email', 'pas-un-email'
-        )]);
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->once())->method('validate')->willReturn($violationList);
+        $validator = Validation::createValidator();
 
         $service = new RegistrationService($em, $hasher, $validator);
 
@@ -68,23 +59,23 @@ class RegistrationServiceTest extends TestCase
 
         $this->assertArrayHasKey('error', $result);
         $this->assertEquals(400, $result['code']);
+        $this->assertStringContainsString('email', $result['error']);
     }
 
-    public function testRegisterFailsIfPasswordTooShort()
+    /**
+     * @dataProvider provideWrongPasswords
+     */
+    public function testRegisterFailsPasswordsIsInvalid(string $password)
     {
         $email = 'test@example.com';
-        $password = '12'; // trop court
 
         $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->never())->method('persist');
 
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
+        $hasher->expects($this->never())->method('hashPassword');
 
-        $violationList = new ConstraintViolationList([new ConstraintViolation(
-            'Password too short', null, [], '', 'password', '12'
-        )]);
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->once())->method('validate')->willReturn($violationList);
-
+        $validator = Validation::createValidator();
         $service = new RegistrationService($em, $hasher, $validator);
 
         $result = $service->register($email, $password);
@@ -92,13 +83,13 @@ class RegistrationServiceTest extends TestCase
         $this->assertArrayHasKey('error', $result);
         $this->assertEquals(400, $result['code']);
     }
+
 
 
     public function testRegisterSuccess()
     {
-        // Arrange
         $email = 'test@example.com';
-        $password = '1234';
+        $password = 'Str0ngP@ssw0rd!';
 
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
@@ -106,28 +97,56 @@ class RegistrationServiceTest extends TestCase
             ->willReturn(null);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
-
+        $em->expects($this->once())->method('getRepository')->willReturn($repository);
         $em->expects($this->once())->method('persist');
         $em->expects($this->once())->method('flush');
 
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
         $hasher->expects($this->once())->method('hashPassword')->willReturn('hashed');
 
-        $validator = $this->createMock(ValidatorInterface::class);
-        $validator->expects($this->once())->method('validate')->willReturn(new ConstraintViolationList());
+        $validator = Validation::createValidator();
 
         $service = new RegistrationService($em, $hasher, $validator);
 
-        // Act
         $result = $service->register($email, $password);
 
-        // Assert
         $this->assertArrayHasKey('user', $result);
         $this->assertEquals(201, $result['code']);
         $this->assertEquals($email, $result['user']->getEmail());
         $this->assertEquals('hashed', $result['user']->getPassword());
     }
+    public static function provideInvalidEmailFormats(): array
+    {
+        return
+        [
+            [''],
+            ['test'],
+            ['test@'],
+            ['@example.com'],
+            ['test@@example.com'],
+            ['test@example'],
+            ['test@.com'],
+            ['test@exam_ple.com'],
+            ['test@-example.com'],
+            ['test@example..com'],
+        ];
+    }
+
+    public static function provideWrongPasswords(): array
+    {
+        return [
+            [''],
+            ['1234567'],
+            ['Password1'],
+            ['Testtest'],
+            ['T3stT3st'],
+            ['Qwerty123'],
+            ['LetMeIn123'],
+            ['Iloveyou1'],
+            ['Admin2023'],
+            ['Summer2022'],
+            ['Pa$$w0rd'],
+        ];
+    }
+
 }

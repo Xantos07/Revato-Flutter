@@ -6,6 +6,8 @@ namespace App\Service;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -32,9 +34,17 @@ class RegistrationService
                     new Assert\NotBlank(),
                     new Assert\Email(),
                 ],
-                'password' => new Assert\Length(min: 4),
+                'password' => [
+                    new NotBlank(),
+                    new PasswordStrength([
+                        'minScore' => PasswordStrength::STRENGTH_MEDIUM,
+                        'message' => 'Le mot de passe est trop faible.',
+                    ]),
+                    new Assert\Length(min: 7)
+                ]
             ])
         );
+
         if (count($errors) > 0) {
             return ['error' => (string) $errors, 'code' => 400];
         }
