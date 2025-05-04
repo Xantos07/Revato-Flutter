@@ -54,8 +54,7 @@ class APIAuthenticator extends AbstractAuthenticator
         }
 
         // Vérification de la signature
-        $secret = $_ENV['JWT_SECRET'];
-        if (!$this->jwtService->check($token, $secret)) {
+        if (!$this->jwtService->check($token)) {
             throw new AuthenticationException('Signature JWT invalide.');
         }
 

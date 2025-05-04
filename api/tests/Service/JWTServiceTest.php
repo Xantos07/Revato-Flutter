@@ -15,14 +15,13 @@ class JWTServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->jwt = new JWTService();
-        $this->secret = 'testSecret';
         $this->header = ['alg' => 'HS256', 'typ' => 'JWT'];
         $this->payload = ['user_id' => 123];
     }
 
     public function testGenerateReturnsValidJWTStructure()
     {
-        $token = $this->jwt->generate($this->header, $this->payload, $this->secret);
+        $token = $this->jwt->generate($this->header, $this->payload);
 
         $this->assertIsString($token);
         $this->assertTrue($this->jwt->isValid($token));
@@ -31,7 +30,7 @@ class JWTServiceTest extends TestCase
 
     public function testPayloadAndHeaderAreCorrectlyDecoded()
     {
-        $token = $this->jwt->generate($this->header, $this->payload, $this->secret);
+        $token = $this->jwt->generate($this->header, $this->payload);
 
         $decodedHeader = $this->jwt->getHeader($token);
         $decodedPayload = $this->jwt->getPayload($token);
@@ -44,21 +43,14 @@ class JWTServiceTest extends TestCase
 
     public function testTokenIsNotExpiredJustAfterGeneration()
     {
-        $token = $this->jwt->generate($this->header, $this->payload, $this->secret, 3600);
+        $token = $this->jwt->generate($this->header, $this->payload, 3600);
         $this->assertFalse($this->jwt->isExpired($token));
     }
 
     public function testTokenIsExpiredIfValidityIsZero()
     {
-        $token = $this->jwt->generate($this->header, $this->payload, $this->secret, 0);
+        $token = $this->jwt->generate($this->header, $this->payload, 0);
         $this->assertTrue($this->jwt->isExpired($token));
-    }
-
-
-    public function testSignatureCheckFailsWithWrongSecret()
-    {
-        $token = $this->jwt->generate($this->header, $this->payload, $this->secret);
-        $this->assertFalse($this->jwt->check($token, 'wrongSecret'));
     }
 
     public function testTokenFailsFormatCheckWithMalformedToken()

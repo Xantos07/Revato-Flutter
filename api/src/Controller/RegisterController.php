@@ -59,10 +59,10 @@ class RegisterController extends AbstractController
         // 2. Génère le JWT AVEC le bon id
         $header = ['alg' => 'HS256', 'typ' => 'JWT'];
         $payload = ['user_id' => $user->getId()];
-        $token = $jwt->generate($header, $payload, $this->getParameter('app.jwtsecret'));
+        $token = $jwt->generate($header, $payload);
 
         $user->setApiToken($token);
-        $em->flush(); // pour sauvegarder le token aussi
+        $em->flush();
 
 
 
