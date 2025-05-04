@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use LoginService;
+use App\Service\LoginService;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
