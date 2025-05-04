@@ -15,14 +15,16 @@ class JWTService
      * @param int $validity
      * @return string
      */
-    public function generate(array $header, array $payload, string $secret, int $validity = 10800): string
+    public function generate(array $header, array $payload, string $secret, int $validity = 2592000): string
     {
-        if($validity > 0){
-            $now = new DateTimeImmutable();
-            $exp = $now->getTimestamp() + $validity;
 
-            $payload['iat'] = $now->getTimestamp();
-            $payload['exp'] = $exp;
+        $now = new DateTimeImmutable();
+        $payload['iat'] = $now->getTimestamp();
+
+        if ($validity > 0) {
+            $payload['exp'] = $now->getTimestamp() + $validity;
+        } else {
+            $payload['exp'] = $now->getTimestamp();
         }
 
         // On encode en base64
@@ -87,7 +89,7 @@ class JWTService
 
         $now = new DateTimeImmutable();
 
-        return $payload['exp'] < $now->getTimestamp();
+        return $payload['exp'] <= $now->getTimestamp();
     }
 
     // On vérifie la signature du Token

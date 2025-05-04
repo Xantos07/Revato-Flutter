@@ -4,7 +4,7 @@ namespace App\Security;
 
 
 use App\Repository\UserRepository;
-use PHPUnit\Util\Json;
+use App\Service\JWTService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,33 +19,61 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 class APIAuthenticator extends AbstractAuthenticator
 {
     private UserRepository $userRepository;
+    private JWTService $jwtService;
 
     // <-- Injection du UserRepository
-    public function __construct(UserRepository $userRepository)
-    {
+    public function __construct(
+        UserRepository $userRepository,
+        JWTService $jwtService
+    ) {
         $this->userRepository = $userRepository;
+        $this->jwtService = $jwtService;
     }
 
 
     public function supports(Request $request): ?bool
     {
         $auth = $request->headers->get('Authorization', '');
-        // 1. On vérifie qu’on a un header et qu’il commence bien par "Bearer "
         return str_starts_with($auth, 'Bearer ');
     }
 
     public function authenticate(Request $request): Passport
     {
-        // 1) Récupère l'en-tête Authorization
         $authHeader = $request->headers->get('Authorization', '');
 
         $token = substr($authHeader, 7);
 
+        // Vérification de la forme
+        if (!$this->jwtService->isValid($token)) {
+            throw new AuthenticationException('Token JWT invalide (mal formé).');
+        }
+
+        // Vérification expiration
+        if ($this->jwtService->isExpired($token)) {
+            throw new AuthenticationException('Token JWT expiré.');
+        }
+
+        // Vérification de la signature
+        $secret = $_ENV['JWT_SECRET'];
+        if (!$this->jwtService->check($token, $secret)) {
+            throw new AuthenticationException('Signature JWT invalide.');
+        }
+
+        // Récupération des infos utilisateur depuis le token
+        $payload = $this->jwtService->getPayload($token);
+
+        if (!isset($payload['email'])) {
+            throw new AuthenticationException('Le token ne contient pas d\'email.');
+        }
+
         return new SelfValidatingPassport(
-            new UserBadge(
-                $token,
-                fn(string $apiToken) => $this->userRepository->findOneBy(['apiToken' => $apiToken])
-            )
+            new UserBadge($payload['email'], function ($userIdentifier) {
+                $user = $this->userRepository->findOneBy(['email' => $userIdentifier]);
+                if (!$user) {
+                    throw new AuthenticationException('Utilisateur non trouvé.');
+                }
+                return $user;
+            })
         );
     }
 
