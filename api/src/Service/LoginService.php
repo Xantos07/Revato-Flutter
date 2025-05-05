@@ -29,9 +29,6 @@ class LoginService
         $header = ['alg' => 'HS256', 'typ' => 'JWT'];
         $token = $this->jwt->generate($header, $payload);
 
-        $user->setApiToken($token);
-        $this->em->flush();
-
         return ['success' => true, 'token' => $token];
     }
 }
