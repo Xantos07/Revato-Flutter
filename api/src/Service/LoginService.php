@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\User;
-use App\Service\JWTService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -12,8 +11,7 @@ class LoginService
     public function __construct(
         private EntityManagerInterface $em,
         private UserPasswordHasherInterface $hasher,
-        private JWTService $jwt,
-        private string $jwtSecret
+        private JWTService $jwt
     ) {}
 
     public function authenticate(string $email, string $password): array
@@ -28,7 +26,8 @@ class LoginService
             'email' => $user->getEmail(),
         ];
 
-        $token = $this->jwt->generate(['typ' => 'JWT', 'alg' => 'HS256'], $payload, $this->jwtSecret);
+        $header = ['alg' => 'HS256', 'typ' => 'JWT'];
+        $token = $this->jwt->generate($header, $payload);
 
         $user->setApiToken($token);
         $this->em->flush();

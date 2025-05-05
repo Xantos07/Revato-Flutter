@@ -1,10 +1,12 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:app/controller/auto_Auth_Controller.dart';
+import '../controller/auto_Auth_Controller.dart';
 
 class SplashViewModel {
-  final _storage = FlutterSecureStorage();
+  final AutoAuthController _authRepository;
+
+  SplashViewModel(this._authRepository);
 
   Future<bool> isAuthenticated() async {
-    final token = await _storage.read(key: 'jwt');
-    return token != null;
+    return await _authRepository.isTokenValid();
   }
 }
