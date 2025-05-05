@@ -16,13 +16,19 @@ class RegistrationService
     private $em;
     private $passwordHasher;
     private $validator;
+    private $jwt;
 
-    public function __construct(EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $em,
+                                UserPasswordHasherInterface $passwordHasher,
+                                ValidatorInterface $validator,
+                                JWTService $jwt)
     {
         $this->em = $em;
         $this->passwordHasher = $passwordHasher;
         $this->validator = $validator;
+        $this->jwt = $jwt;
     }
+
 
     public function register(string $email, string $plainPassword): array
     {
@@ -50,7 +56,7 @@ class RegistrationService
         }
 
         if ($this->em->getRepository(User::class)->findOneBy(['email' => $email])) {
-            return ['error' => 'Email déjà utilisé', 'code' => 409];
+            return ['success' => false, 'error' => 'Email déjà utilisé', 'code' => 409];
         }
 
         $user = new User();
@@ -59,6 +65,14 @@ class RegistrationService
         $this->em->persist($user);
         $this->em->flush();
 
-        return ['user' => $user, 'code' => 201];
+        $payload = [
+            'user_id' => $user->getId(),
+            'email' => $user->getEmail(),
+        ];
+
+        $header = ['alg' => 'HS256', 'typ' => 'JWT'];
+        $token = $this->jwt->generate($header, $payload);
+
+        return ['success' => true,'token' => $token, 'code' => 201];
     }
 }
