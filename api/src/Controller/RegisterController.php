@@ -61,11 +61,6 @@ class RegisterController extends AbstractController
         $payload = ['user_id' => $user->getId()];
         $token = $jwt->generate($header, $payload);
 
-        $user->setApiToken($token);
-        $em->flush();
-
-
-
         return $this->json([
             'message' => 'Utilisateur créé avec succès',
             'token' => $token,
