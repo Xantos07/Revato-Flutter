@@ -22,6 +22,7 @@ jobs:
 
       - name:  Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
+        working-directory: ./api
 
       - name:  Upload files to VPS
         uses: appleboy/scp-action@v0.1.4
