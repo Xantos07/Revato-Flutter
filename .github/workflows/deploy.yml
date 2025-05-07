@@ -20,11 +20,11 @@ jobs:
           php-version: '8.2'
           extensions: mbstring, pdo, pdo_mysql, intl, dom, curl, openssl
 
-      - name: Install Composer dependencies
-        run: composer install --no-dev --optimize-autoloader
+      - name: Install Composer dependencies (no auto-scripts)
+        run: composer install --no-dev --optimize-autoloader --no-scripts
         working-directory: ./api
 
-      - name: Dump optimized env file
+      - name: Generate .env.local.php from GitHub Secrets
         run: php bin/console dotenv:dump --env=prod
         working-directory: ./api
         env:
@@ -33,7 +33,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
-      - name: Upload files to VPS
+      - name: Upload API to VPS via SCP
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -51,5 +51,6 @@ jobs:
           script: |
             cd /var/www/symfony-api
             php bin/console cache:clear --env=prod --no-warmup || echo "cache skipped"
+            php bin/console cache:warmup --env=prod || echo "warmup skipped"
             php bin/console doctrine:migrations:migrate --env=prod --no-interaction || echo "no migrations"
             systemctl reload php8.2-fpm || true
