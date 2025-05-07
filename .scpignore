@@ -1,0 +1,8 @@
+.git
+.github
+tests
+.env
+.env.local
+docker-compose.yml
+deploy.sh
+README.md
