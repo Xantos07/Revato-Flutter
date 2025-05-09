@@ -1,0 +1,39 @@
+name: Restrict PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  restrict-prs:
+    runs-on: ubuntu-latest
+    env:
+      BASE_PATTERN: "^main$"
+      HEAD_PATTERN: "^dev/.*$"
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Display pull request information
+        run: |
+          echo "🔍 Base branch: ${{ github.event.pull_request.base.ref }}"
+          echo "🔍 Head branch: ${{ github.event.pull_request.head.ref }}"
+
+      - name: Validate PR branch rules
+        run: |
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
+
+          echo "✅ Validation en cours : $HEAD_BRANCH ➝ $BASE_BRANCH"
+
+          if [[ "$BASE_BRANCH" =~ $BASE_PATTERN ]]; then
+            if [[ ! "$HEAD_BRANCH" =~ $HEAD_PATTERN ]]; then
+              echo "::error::❌ Interdit : Seules les branches 'dev/*' peuvent être mergées dans 'main'."
+              echo "Tentative de merge de '$HEAD_BRANCH' vers '$BASE_BRANCH' rejetée."
+              exit 1
+            fi
+          fi
+
+      - name: ✅ Validation réussie
+        if: success()
+        run: echo "✅ Les noms de branches sont valides. Merge possible."
