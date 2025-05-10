@@ -3,12 +3,13 @@ name: Tests unitaires api
 on:
   pull_request:
     branches:
-      - 'dev'
       - 'main'
   release:
     types: [published]
 jobs:
   test:
+    if: github.event.pull_request.base.ref == 'main'
+
     runs-on: ubuntu-latest
 
     services:
