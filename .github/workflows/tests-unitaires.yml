@@ -1,0 +1,65 @@
+name: Tests unitaires api
+
+on:
+  pull_request:
+    branches:
+      - 'dev'
+      - 'main'
+  release:
+    types: [published]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, pdo_mysql
+          tools: phpunit, composer
+
+      - name: Install dependencies (Symfony)
+        working-directory: ./api
+        run: composer install --prefer-dist --no-progress --no-scripts
+
+      - name: Create .env (required by Symfony)
+        working-directory: ./api
+        run: |
+          echo "APP_ENV=test" > .env
+          echo "APP_SECRET=placeholder" >> .env
+
+      - name: Create .env.test.local
+        working-directory: ./api
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env.test.local
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.test.local
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> .env.test.local
+          echo "APP_ENV=test" >> .env.test.local
+          echo "MESSENGER_TRANSPORT_DSN=sync:///" >> .env.test.local
+
+      - name: Create database schema (faster for CI)
+        working-directory: ./api
+        run: php bin/console doctrine:schema:create --env=test
+
+
+      - name: Run PHPUnit tests
+        working-directory: ./api
+        run: php bin/phpunit --colors=always
