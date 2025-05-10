@@ -58,7 +58,7 @@ class DreamCard extends StatelessWidget {
 
             const SizedBox(height: 4),
             Text(
-              dream.content.length > 40
+              dream.content.length > 20
                   ? '${dream.content.substring(0, 40)}...'
                   : dream.content,
               style: const TextStyle(fontStyle: FontStyle.italic),

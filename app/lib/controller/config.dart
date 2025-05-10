@@ -1,5 +1,5 @@
-const bool isProd = bool.fromEnvironment('dart.vm.product');
-
-final String API_BASE_URL = isProd
-    ? 'http://185.157.247.17'
-    : 'http://185.157.247.17'; //'http://localhost:8000';
+const String API_BASE_URL = String.fromEnvironment(
+  'API_URL',
+  defaultValue: 'http://localhost:8000',
+  //defaultValue: 'http://185.157.247.17:8000',
+);
