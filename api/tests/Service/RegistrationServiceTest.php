@@ -3,6 +3,7 @@
 namespace App\Tests\Service;
 
 use App\Entity\User;
+use App\Service\JWTService;
 use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
 use App\Service\RegistrationService;
@@ -21,15 +22,14 @@ class RegistrationServiceTest extends TestCase
 
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())->method('findOneBy')->willReturn($userMock);
-
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())->method('getRepository')->willReturn($repository);
-
+        $jwt = $this->createMock(JWTService::class);
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
 
         $validator = Validation::createValidator();
 
-        $service = new RegistrationService($em, $hasher, $validator);
+        $service = new RegistrationService($em, $hasher, $validator,$jwt);
 
         $result = $service->register($email, $password);
 
@@ -51,9 +51,11 @@ class RegistrationServiceTest extends TestCase
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
         $hasher->expects($this->never())->method('hashPassword');
 
+        $jwt = $this->createMock(JWTService::class);
+
         $validator = Validation::createValidator();
 
-        $service = new RegistrationService($em, $hasher, $validator);
+        $service = new RegistrationService($em, $hasher, $validator,$jwt);
 
         $result = $service->register($email, $password);
 
@@ -75,8 +77,10 @@ class RegistrationServiceTest extends TestCase
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
         $hasher->expects($this->never())->method('hashPassword');
 
+        $jwt = $this->createMock(JWTService::class);
+
         $validator = Validation::createValidator();
-        $service = new RegistrationService($em, $hasher, $validator);
+        $service = new RegistrationService($em, $hasher, $validator,$jwt);
 
         $result = $service->register($email, $password);
 
@@ -104,16 +108,17 @@ class RegistrationServiceTest extends TestCase
         $hasher = $this->createMock(UserPasswordHasherInterface::class);
         $hasher->expects($this->once())->method('hashPassword')->willReturn('hashed');
 
+        $jwt = $this->createMock(JWTService::class);
+
         $validator = Validation::createValidator();
 
-        $service = new RegistrationService($em, $hasher, $validator);
+        $service = new RegistrationService($em, $hasher, $validator,$jwt);
 
         $result = $service->register($email, $password);
 
-        $this->assertArrayHasKey('user', $result);
+        $this->assertArrayHasKey('token', $result);
         $this->assertEquals(201, $result['code']);
-        $this->assertEquals($email, $result['user']->getEmail());
-        $this->assertEquals('hashed', $result['user']->getPassword());
+        $this->assertEquals('test@example.com', $email);
     }
     public static function provideInvalidEmailFormats(): array
     {
