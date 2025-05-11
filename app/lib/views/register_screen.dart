@@ -112,12 +112,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         text: 'At least 15 characters',
                       ),
                       PasswordCriteriaItem(
-                        isValid: viewModel.hasLowercase(passwordController.text),
-                        text: 'At least 2 lowercase letters',
+                        isValid: viewModel.hasAtLeastNDistinctLowercase(passwordController.text, 5),
+                        text: 'At least 5 different lowercase letters',
                       ),
                       PasswordCriteriaItem(
-                        isValid: viewModel.hasUppercase(passwordController.text),
-                        text: 'At least 2 uppercase letters',
+                        isValid: viewModel.hasAtLeastNDistinctUppercase(passwordController.text, 2),
+                        text: 'At least 2 different uppercase letters',
                       ),
                       PasswordCriteriaItem(
                         isValid: viewModel.hasDigits(passwordController.text),

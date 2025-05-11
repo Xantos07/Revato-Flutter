@@ -24,4 +24,17 @@ class RegisterViewModel {
   bool hasSpecialChars(String pass) =>
       RegExp(r'[!@#\$%\^&*(),.?":{}|<>].*[!@#\$%\^&*(),.?":{}|<>]')
           .hasMatch(pass);
+
+  bool hasAtLeastNDistinctLowercase(String pass, int n) {
+    final lowercaseLetters =
+    pass.runes.where((r) => r >= 97 && r <= 122).map((r) => String.fromCharCode(r)).toSet();
+    return lowercaseLetters.length >= n;
+  }
+
+  bool hasAtLeastNDistinctUppercase(String pass, int n) {
+    final uppercaseLetters =
+    pass.runes.where((r) => r >= 65 && r <= 90).map((r) => String.fromCharCode(r)).toSet();
+    return uppercaseLetters.length >= n;
+  }
+
 }
