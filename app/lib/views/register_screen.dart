@@ -62,7 +62,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _buildTextField("Email", emailController, false),
                 const SizedBox(height: 16),
                 _buildTextField("Mot de passe", passwordController, true),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                    child: const Text("J'ai déjà un compte ? Connexion"),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
