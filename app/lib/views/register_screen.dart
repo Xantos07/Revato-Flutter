@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:password_strength_checker/password_strength_checker.dart';
 import '../../viewmodels/register_viewmodel.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,6 +15,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final RegisterViewModel viewModel = RegisterViewModel();
 
   bool isLoading = false;
+
+  final passNotifier = ValueNotifier<PasswordStrength?>(null);
+
 
   void _handleRegister() async {
     setState(() => isLoading = true);
@@ -58,10 +62,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: Colors.deepPurple,
                   ),
                 ),
+
                 const SizedBox(height: 32),
                 _buildTextField("Email", emailController, false),
+
                 const SizedBox(height: 16),
-                _buildTextField("Mot de passe", passwordController, true),
+                //_buildTextField("Mot de passe", passwordController, true),
+
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    labelText: 'Mot de passe',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onChanged: (value) {
+                    passNotifier.value = PasswordStrength.calculate(text: value);
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                PasswordStrengthChecker(
+                  strength: passNotifier,
+                ),
+
                 const SizedBox(height: 24),
                 Align(
                   alignment: Alignment.centerRight,
