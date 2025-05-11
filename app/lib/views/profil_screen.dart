@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/profile_option_tile.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -62,8 +63,13 @@ class ProfileScreen extends StatelessWidget {
                     iconColor: Colors.red,
                     textColor: Colors.red,
                     title: "Déconnexion",
-                    onTap: () {
-                      // TODO
+                    onTap: () async {
+                      final storage = FlutterSecureStorage();
+                      await storage.delete(key: 'jwt');
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/login',
+                            (Route<dynamic> route) => false,
+                      );
                     },
                   ),
                 ],
