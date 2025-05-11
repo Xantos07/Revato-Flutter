@@ -7,6 +7,9 @@ class RegisterViewModel {
     return await _authService.register(email.trim(), password);
   }
 
+  bool isEmailValid(String pass) =>
+      RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(pass);
+
   bool isLengthValid(String pass) => pass.length >= 15;
 
   bool hasLowercase(String pass) =>

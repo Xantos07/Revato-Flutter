@@ -74,6 +74,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
                 _buildTextField("Email", emailController, false),
 
+                if(emailController.text.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if(!viewModel.isEmailValid(emailController.text))
+                        const Text("email incorrect")
+                    ],
+                    ),
+                
+
                 const SizedBox(height: 16),
                 //_buildTextField("Mot de passe", passwordController, true),
 
