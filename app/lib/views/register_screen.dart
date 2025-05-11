@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:password_strength_checker/password_strength_checker.dart';
 import '../../viewmodels/register_viewmodel.dart';
+import '../../widgets/custom_pass_strength.dart';
+import '../widgets/password_criteria_item.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -14,6 +17,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final RegisterViewModel viewModel = RegisterViewModel();
 
   bool isLoading = false;
+
+  final passNotifier = ValueNotifier<CustomPassStrength?>(null);
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(() => setState(() {}));
+  }
+
 
   void _handleRegister() async {
     setState(() => isLoading = true);
@@ -58,10 +70,72 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: Colors.deepPurple,
                   ),
                 ),
+
                 const SizedBox(height: 32),
                 _buildTextField("Email", emailController, false),
+
+                if(emailController.text.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if(!viewModel.isEmailValid(emailController.text))
+                        const Text("email incorrect")
+                    ],
+                    ),
+                
+
                 const SizedBox(height: 16),
-                _buildTextField("Mot de passe", passwordController, true),
+                //_buildTextField("Mot de passe", passwordController, true),
+
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    labelText: 'Mot de passe',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onChanged: (value) {
+                    passNotifier.value = CustomPassStrength.calculate(text: value);
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                if (passwordController.text.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      PasswordCriteriaItem(
+                        isValid: viewModel.isLengthValid(passwordController.text),
+                        text: 'At least 15 characters',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasAtLeastNDistinctLowercase(passwordController.text, 5),
+                        text: 'At least 5 different lowercase letters',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasAtLeastNDistinctUppercase(passwordController.text, 2),
+                        text: 'At least 2 different uppercase letters',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasDigits(passwordController.text),
+                        text: 'At least 2 digits',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasSpecialChars(passwordController.text),
+                        text: 'At least 2 special characters',
+                      ),
+                    ],
+                  ),
+
+                const SizedBox(height: 16),
+
+                PasswordStrengthChecker(
+                  strength: passNotifier,
+                ),
+
                 const SizedBox(height: 24),
                 Align(
                   alignment: Alignment.centerRight,
