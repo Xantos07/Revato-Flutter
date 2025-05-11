@@ -1,4 +1,3 @@
-// lib/viewmodels/register_viewmodel.dart
 import '../../controller/register_controller.dart';
 
 class RegisterViewModel {
@@ -7,4 +6,19 @@ class RegisterViewModel {
   Future<bool> register(String email, String password) async {
     return await _authService.register(email.trim(), password);
   }
+
+  bool isLengthValid(String pass) => pass.length >= 15;
+
+  bool hasLowercase(String pass) =>
+      RegExp(r'[a-z].*[a-z]').hasMatch(pass);
+
+  bool hasUppercase(String pass) =>
+      RegExp(r'[A-Z].*[A-Z]').hasMatch(pass);
+
+  bool hasDigits(String pass) =>
+      RegExp(r'\d.*\d').hasMatch(pass);
+
+  bool hasSpecialChars(String pass) =>
+      RegExp(r'[!@#\$%\^&*(),.?":{}|<>].*[!@#\$%\^&*(),.?":{}|<>]')
+          .hasMatch(pass);
 }

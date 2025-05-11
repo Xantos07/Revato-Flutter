@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 import '../../viewmodels/register_viewmodel.dart';
+import '../../widgets/custom_pass_strength.dart';
+import '../widgets/password_criteria_item.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -16,7 +18,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool isLoading = false;
 
-  final passNotifier = ValueNotifier<PasswordStrength?>(null);
+  final passNotifier = ValueNotifier<CustomPassStrength?>(null);
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(() => setState(() {}));
+  }
 
 
   void _handleRegister() async {
@@ -80,9 +88,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   onChanged: (value) {
-                    passNotifier.value = PasswordStrength.calculate(text: value);
+                    passNotifier.value = CustomPassStrength.calculate(text: value);
                   },
                 ),
+                const SizedBox(height: 12),
+
+                if (passwordController.text.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      PasswordCriteriaItem(
+                        isValid: viewModel.isLengthValid(passwordController.text),
+                        text: 'At least 15 characters',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasLowercase(passwordController.text),
+                        text: 'At least 2 lowercase letters',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasUppercase(passwordController.text),
+                        text: 'At least 2 uppercase letters',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasDigits(passwordController.text),
+                        text: 'At least 2 digits',
+                      ),
+                      PasswordCriteriaItem(
+                        isValid: viewModel.hasSpecialChars(passwordController.text),
+                        text: 'At least 2 special characters',
+                      ),
+                    ],
+                  ),
 
                 const SizedBox(height: 16),
 
