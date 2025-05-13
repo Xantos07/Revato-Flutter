@@ -1,4 +1,5 @@
 import 'package:app/views/privacy_policy_screen.dart';
+import 'package:app/views/settings_screen.dart';
 import 'package:app/views/terms_conditions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +60,10 @@ class ProfileScreen extends StatelessWidget {
                             }),
                         ProfileOptionTile(icon: Icons.settings, title: "Paramètres",
                             onTap: () {
-
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const SettingsScreen())
+                              );
                             }),
                         ProfileOptionTile(
                           icon: Icons.logout,
