@@ -1,8 +1,7 @@
-import 'package:app/controller/auto_Auth_Controller.dart';
-import '../controller/auto_Auth_Controller.dart';
+import 'package:app/controller/authentification_controller.dart';
 
 class SplashViewModel {
-  final AutoAuthController _authRepository;
+  final AuthController _authRepository;
 
   SplashViewModel(this._authRepository);
 

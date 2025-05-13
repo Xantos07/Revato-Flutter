@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../controller/authentification_controller.dart';
 import '../viewmodels/splash_viewmodel.dart';
-import '../controller/auto_Auth_Controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,7 +10,7 @@ class SplashScreen extends StatefulWidget {
 }
 class _SplashScreenState extends State<SplashScreen> {
 
-  final SplashViewModel _splashViewModel = SplashViewModel(AutoAuthController());
+  final SplashViewModel _splashViewModel = SplashViewModel(AuthController());
   @override
   void initState() {
     super.initState();
