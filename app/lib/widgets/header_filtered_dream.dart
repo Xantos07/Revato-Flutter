@@ -1,31 +1,28 @@
-import 'package:app/controller/tag_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:app/controller/tag_controller.dart';
 import '../models/tag_model.dart' as models;
 import '../viewmodels/hearder_filter_view_model.dart';
 import '../models/app_colors.dart' as models;
 
 class HeaderFilteredDream extends StatefulWidget {
   final List<String> selectedTags;
-  final DateTime? selectedDate;
-  final Function(List<String> tags, DateTime? date) onFilterChanged;
+  final DateTimeRange? selectedDateRange;
+  final Function(List<String> tags, DateTimeRange? range) onFilterChanged;
 
   const HeaderFilteredDream({
     Key? key,
     required this.selectedTags,
-    required this.selectedDate,
+    required this.selectedDateRange,
     required this.onFilterChanged,
   }) : super(key: key);
-
 
   @override
   State<HeaderFilteredDream> createState() => _HeaderFilteredDreamState();
 }
 
 class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
-
   late HeaderFilterViewModel headerFilterViewModel;
   late List<models.TagModel> allTags;
-
 
   @override
   void initState() {
@@ -35,9 +32,8 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
     allTags = [];
 
     headerFilterViewModel.selectedTags = List.from(widget.selectedTags);
-    headerFilterViewModel.selectedDate = widget.selectedDate;
+    headerFilterViewModel.selectedDateRange = widget.selectedDateRange;
   }
-
 
   void _loadTags() async {
     try {
@@ -48,11 +44,9 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
         SnackBar(content: Text('Erreur chargement tags initiaux : $e')),
       );
     }
-
-    print('📦 Catégories récupérées : ${allTags.map((t) => t.name).toSet()}');
   }
-  void _openTagSelector() async {
 
+  void _openTagSelector() async {
     String selectedCategory = 'beforeEvent';
     TextEditingController searchController = TextEditingController();
 
@@ -67,7 +61,6 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            // 🔁 Recalcul ici à chaque rebuild
             final tagsByCategory = {
               for (var key in categories.keys)
                 key: allTags.where((t) => t.category == key).toList()
@@ -87,9 +80,7 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                       prefixIcon: Icon(Icons.search),
                       hintText: 'Rechercher un tag...',
                     ),
-                    onChanged: (value) {
-                      setModalState(() {});
-                    },
+                    onChanged: (value) => setModalState(() {}),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -100,7 +91,7 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                       final isSelected = selectedCategory == entry.key;
                       return ChoiceChip(
                         label: SizedBox(
-                          width: 120, // fixe pour uniformiser visuellement
+                          width: 120,
                           child: Center(child: Text(entry.value)),
                         ),
                         selected: isSelected,
@@ -114,15 +105,10 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                           side: BorderSide(color: Colors.deepPurple.withOpacity(0.3)),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        onSelected: (_) {
-                          setModalState(() {
-                            selectedCategory = entry.key;
-                          });
-                        },
+                        onSelected: (_) => setModalState(() => selectedCategory = entry.key),
                       );
                     }).toList(),
                   ),
-
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 200,
@@ -135,37 +121,32 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                             tag.name,
                             style: TextStyle(color: models.getColorForCategory(tag.category)),
                           ),
-                          trailing: isSelected ? const Icon(Icons.check, color: Colors.deepPurple) : null,
-                          onTap: () {
-                            setModalState(() {
-                              if (isSelected) {
-                                headerFilterViewModel.removeTag(tag.name);
-                              } else {
-                                headerFilterViewModel.addTag(tag.name);
-                              }
-                            });
-                          },
-
-
+                          trailing: isSelected
+                              ? const Icon(Icons.check, color: Colors.deepPurple)
+                              : null,
+                          onTap: () => setModalState(() {
+                            isSelected
+                                ? headerFilterViewModel.removeTag(tag.name)
+                                : headerFilterViewModel.addTag(tag.name);
+                          }),
                         );
                       }).toList(),
                     ),
                   ),
                 ],
               ),
-                actions: [
-                  TextButton(
-                    child: const Text('Fermer'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      widget.onFilterChanged(
-                        headerFilterViewModel.selectedTags,
-                        headerFilterViewModel.selectedDate,
-                      );
-                    },
-                  )
-                ]
-
+              actions: [
+                TextButton(
+                  child: const Text('Fermer'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    widget.onFilterChanged(
+                      headerFilterViewModel.selectedTags,
+                      headerFilterViewModel.selectedDateRange,
+                    );
+                  },
+                )
+              ],
             );
           },
         );
@@ -173,6 +154,13 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
     );
   }
 
+  String _formatRangeMultiLine(DateTimeRange? range) {
+    if (range == null) return 'Choisir\nune plage';
+    final start = range.start;
+    final end = range.end;
+    return "${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year}\n"
+        "${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,9 +181,7 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        headerFilterViewModel.toggleFilterMode();
-                      });
+                      setState(() => headerFilterViewModel.toggleFilterMode());
                     },
                     child: Text(headerFilterViewModel.filterMode),
                     style: ElevatedButton.styleFrom(
@@ -204,40 +190,67 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  OutlinedButton(
-                    onPressed: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: headerFilterViewModel.selectedDate ?? DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                      );
-                      if (picked != null) {
-                        setState(() {
-                          headerFilterViewModel.updateDate(picked);
-                          widget.onFilterChanged?.call(
-                            headerFilterViewModel.selectedTags,
-                            headerFilterViewModel.selectedDate,
-                          );
-                        });
-                      }
-                    },
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        final picked = await showDateRangePicker(
+                          context: context,
+                          initialDateRange: headerFilterViewModel.selectedDateRange,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                          initialEntryMode: DatePickerEntryMode.input,
+
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                dialogBackgroundColor: Colors.white,
+                              ),
+                              child: ScrollConfiguration(
+                                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                                child: child!,
+                              ),
+                            );
+                          },
+                        );
+
+                        if (picked != null) {
+                          setState(() {
+                            headerFilterViewModel.updateDateRange(picked);
+                            widget.onFilterChanged(
+                              headerFilterViewModel.selectedTags,
+                              headerFilterViewModel.selectedDateRange,
+                            );
+                          });
+                        }
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        side: const BorderSide(color: Colors.deepPurple),
                       ),
-                      side: const BorderSide(color: Colors.deepPurple),
-                    ),
-                    child: Text(
-                      headerFilterViewModel.selectedDate == null
-                          ? 'Choisir une date'
-                          : "${headerFilterViewModel.selectedDate!.day.toString().padLeft(2, '0')}/"
-                          "${headerFilterViewModel.selectedDate!.month.toString().padLeft(2, '0')}/"
-                          "${headerFilterViewModel.selectedDate!.year}",
+                      child: Text(
+                        _formatRangeMultiLine(headerFilterViewModel.selectedDateRange),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        headerFilterViewModel.clearDate();
+                        widget.onFilterChanged(
+                          headerFilterViewModel.selectedTags,
+                          null,
+                        );
+                      });
+                    },
+                    icon: const Icon(Icons.close),
+                    tooltip: "Réinitialiser la date",
+                  ),
+                  const SizedBox(width: 8),
                   Material(
                     color: Colors.deepPurple,
                     shape: const CircleBorder(),
@@ -274,9 +287,9 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                   onDeleted: () {
                     setState(() {
                       headerFilterViewModel.removeTag(tag.name);
-                      widget.onFilterChanged?.call(
+                      widget.onFilterChanged(
                         headerFilterViewModel.selectedTags,
-                        headerFilterViewModel.selectedDate,
+                        headerFilterViewModel.selectedDateRange,
                       );
                     });
                   },
@@ -288,6 +301,4 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
       ),
     );
   }
-
-
 }

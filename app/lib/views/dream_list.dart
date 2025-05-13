@@ -21,7 +21,7 @@ class _DreamListState extends State<DreamList> {
   late Future<Map<DateTime, List<Dream>>> _groupedDreams;
 
   List<String> _activeTags = [];
-  DateTime? _activeDate;
+  DateTimeRange? _activeDateRange;
 
   @override
   void initState() {
@@ -39,10 +39,10 @@ class _DreamListState extends State<DreamList> {
               dream.tagsBeforeFeeling.contains(tag) ||
               dream.tagsDreamFeeling.contains(tag));
 
-      final dateMatch = _activeDate == null ||
-          (dream.date.year == _activeDate!.year &&
-              dream.date.month == _activeDate!.month &&
-              dream.date.day == _activeDate!.day);
+      final dateMatch = _activeDateRange == null ||
+          (dream.date.isAfter(_activeDateRange!.start.subtract(const Duration(days: 1))) &&
+              dream.date.isBefore(_activeDateRange!.end.add(const Duration(days: 1))));
+
 
       return tagMatch && dateMatch;
     });
@@ -77,15 +77,16 @@ class _DreamListState extends State<DreamList> {
 
             HeaderFilteredDream(
               selectedTags: _activeTags,
-              selectedDate: _activeDate,
-              onFilterChanged: (tags, date) {
+              selectedDateRange: _activeDateRange,
+              onFilterChanged: (tags, range) {
                 setState(() {
                   _activeTags = tags;
-                  _activeDate = date;
+                  _activeDateRange = range;
                   _groupedDreams = _loadFilteredDreams();
                 });
               },
             ),
+
 
 
             ...grouped.entries.map((entry) {

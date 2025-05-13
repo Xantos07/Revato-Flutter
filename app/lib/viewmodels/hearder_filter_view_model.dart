@@ -1,9 +1,10 @@
-// lib/viewmodels/header_filter_viewmodel.dart
+import 'package:flutter/material.dart';
+
 import '../controller/tag_controller.dart';
 import '../models/tag_model.dart';
 
 class HeaderFilterViewModel {
-  DateTime? selectedDate;
+  DateTimeRange? selectedDateRange;
   String filterMode = 'OU';
   List<String> selectedTags = [];
 
@@ -27,7 +28,11 @@ class HeaderFilterViewModel {
     selectedTags.remove(tag);
   }
 
-  void updateDate(DateTime date) {
-    selectedDate = date;
+  void updateDateRange(DateTimeRange? range) {
+    selectedDateRange = range;
+  }
+
+  void clearDate() {
+    selectedDateRange = null;
   }
 }
