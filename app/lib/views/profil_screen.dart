@@ -1,4 +1,5 @@
 import 'package:app/views/privacy_policy_screen.dart';
+import 'package:app/views/terms_conditions_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/profil_view_model.dart';
@@ -51,7 +52,10 @@ class ProfileScreen extends StatelessWidget {
                             }),
                         ProfileOptionTile(icon: Icons.rule, title: "Conditions d’utilisation",
                             onTap: () {
-
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const TermsConditionsScreen())
+                              );
                             }),
                         ProfileOptionTile(icon: Icons.settings, title: "Paramètres",
                             onTap: () {
