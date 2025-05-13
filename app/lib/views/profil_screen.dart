@@ -1,3 +1,4 @@
+import 'package:app/views/privacy_policy_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/profil_view_model.dart';
@@ -41,9 +42,21 @@ class ProfileScreen extends StatelessWidget {
                   Expanded(
                     child: ListView(
                       children: [
-                        ProfileOptionTile(icon: Icons.privacy_tip, title: "Politique de Confidentialité", onTap: () {}),
-                        ProfileOptionTile(icon: Icons.rule, title: "Conditions d’utilisation", onTap: () {}),
-                        ProfileOptionTile(icon: Icons.settings, title: "Paramètres", onTap: () {}),
+                        ProfileOptionTile(icon: Icons.privacy_tip, title: "Politique de Confidentialité",
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen()),
+                              );
+                            }),
+                        ProfileOptionTile(icon: Icons.rule, title: "Conditions d’utilisation",
+                            onTap: () {
+
+                            }),
+                        ProfileOptionTile(icon: Icons.settings, title: "Paramètres",
+                            onTap: () {
+
+                            }),
                         ProfileOptionTile(
                           icon: Icons.logout,
                           iconColor: Colors.red,
