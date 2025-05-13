@@ -1,4 +1,4 @@
-import '../controller/login_controller.dart';
+import '../controller/authentification_controller.dart';
 
 class LoginViewModel {
   final AuthController _authService = AuthController();

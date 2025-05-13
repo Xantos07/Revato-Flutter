@@ -1,7 +1,7 @@
-import '../../controller/register_controller.dart';
+import 'package:app/controller/authentification_controller.dart';
 
 class RegisterViewModel {
-  final AuthService _authService = AuthService();
+  final AuthController _authService = AuthController();
 
   Future<bool> register(String email, String password) async {
     return await _authService.register(email.trim(), password);
