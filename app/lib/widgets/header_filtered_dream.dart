@@ -3,7 +3,10 @@ import 'package:app/controller/tag_controller.dart';
 import '../models/tag_model.dart' as models;
 import '../viewmodels/hearder_filter_view_model.dart';
 import '../models/app_colors.dart' as models;
+import 'tag_selector.dart';
 
+
+//Wrapper
 class HeaderFilteredDream extends StatefulWidget {
   final List<String> selectedTags;
   final DateTimeRange? selectedDateRange;
@@ -46,113 +49,6 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
     }
   }
 
-  void _openTagSelector() async {
-    String selectedCategory = 'beforeEvent';
-    TextEditingController searchController = TextEditingController();
-
-    final categories = {
-      'beforeEvent': 'Événement',
-      'beforeFeeling': 'Ressenti veille',
-      'dreamFeeling': 'Ressenti rêve',
-    };
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            final tagsByCategory = {
-              for (var key in categories.keys)
-                key: allTags.where((t) => t.category == key).toList()
-            };
-
-            final visibleTags = tagsByCategory[selectedCategory]!;
-
-            return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text("Ajouter un tag"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: searchController,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Rechercher un tag...',
-                    ),
-                    onChanged: (value) => setModalState(() {}),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: categories.entries.map((entry) {
-                      final isSelected = selectedCategory == entry.key;
-                      return ChoiceChip(
-                        label: SizedBox(
-                          width: 120,
-                          child: Center(child: Text(entry.value)),
-                        ),
-                        selected: isSelected,
-                        selectedColor: Colors.deepPurple,
-                        labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black87,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.deepPurple.withOpacity(0.3)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onSelected: (_) => setModalState(() => selectedCategory = entry.key),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 200,
-                    width: double.maxFinite,
-                    child: ListView(
-                      children: visibleTags.map((tag) {
-                        final isSelected = headerFilterViewModel.selectedTags.contains(tag.name);
-                        return ListTile(
-                          title: Text(
-                            tag.name,
-                            style: TextStyle(color: models.getColorForCategory(tag.category)),
-                          ),
-                          trailing: isSelected
-                              ? const Icon(Icons.check, color: Colors.deepPurple)
-                              : null,
-                          onTap: () => setModalState(() {
-                            isSelected
-                                ? headerFilterViewModel.removeTag(tag.name)
-                                : headerFilterViewModel.addTag(tag.name);
-                          }),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  child: const Text('Fermer'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    widget.onFilterChanged(
-                      headerFilterViewModel.selectedTags,
-                      headerFilterViewModel.selectedDateRange,
-                    );
-                  },
-                )
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 
   String _formatRangeMultiLine(DateTimeRange? range) {
     if (range == null) return 'Choisir\nune plage';
@@ -161,6 +57,27 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
     return "${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}/${start.year}\n"
         "${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}/${end.year}";
   }
+
+  void _openTagSelector() async {
+    await showDialog(
+      context: context,
+      builder: (_) => TagSelector(
+
+        allTags: allTags,
+        selectedTags: headerFilterViewModel.selectedTags,
+        onTagsUpdated: (newTags) {
+          setState(() {
+            headerFilterViewModel.selectedTags = newTags;
+            widget.onFilterChanged(
+              newTags,
+              headerFilterViewModel.selectedDateRange,
+            );
+          });
+        },
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
