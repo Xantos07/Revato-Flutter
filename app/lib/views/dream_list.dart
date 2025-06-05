@@ -1,11 +1,11 @@
-// lib/views/dream_list.dart
-
 import 'package:flutter/material.dart';
 import '../models/dream.dart';
+import '../models/tag_model.dart';
 import '../viewmodels/dream_list_viewmodel.dart';
+import '../viewmodels/hearder_filter_view_model.dart';
 import '../widgets/dream_card.dart';
 import '../widgets/dream_section.dart';
-import '../widgets/header_filtered_dream.dart';
+import '../widgets/header_filtered_dream/header_filtered_dream.dart';
 import '../widgets/page_header.dart';
 
 class DreamList extends StatefulWidget {
@@ -17,15 +17,27 @@ class DreamList extends StatefulWidget {
 
 class _DreamListState extends State<DreamList> {
   final DreamListViewModel _viewModel = DreamListViewModel();
+  late final HeaderFilterViewModel _headerFilterViewModel;
 
+  // 1️⃣ On déclare un Future pour charger les tags (une seule fois)
+  late final Future<List<TagModel>> _allTagsFuture;
+
+  // Gestion des rêves filtrés
   late Future<Map<DateTime, List<Dream>>> _groupedDreams;
-
   List<String> _activeTags = [];
   DateTimeRange? _activeDateRange;
 
   @override
   void initState() {
     super.initState();
+
+    // Instancie le ViewModel pour les filtres
+    _headerFilterViewModel = HeaderFilterViewModel();
+
+    // 1️⃣ Lance l’appel asynchrone pour charger tous les tags
+    _allTagsFuture = _headerFilterViewModel.fetchTags();
+
+    // 2️⃣ Précharge les rêves (au moins une première fois) sans filtres
     _groupedDreams = _loadFilteredDreams();
   }
 
@@ -43,7 +55,6 @@ class _DreamListState extends State<DreamList> {
           (dream.date.isAfter(_activeDateRange!.start.subtract(const Duration(days: 1))) &&
               dream.date.isBefore(_activeDateRange!.end.add(const Duration(days: 1))));
 
-
       return tagMatch && dateMatch;
     });
 
@@ -60,35 +71,63 @@ class _DreamListState extends State<DreamList> {
   Widget build(BuildContext context) {
     return FutureBuilder<Map<DateTime, List<Dream>>>(
       future: _groupedDreams,
-      builder: (ctx, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      builder: (ctxDreams, snapshotDreams) {
+        if (snapshotDreams.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snapshot.hasError) {
-          return Center(child: Text('Erreur: ${snapshot.error}'));
+        if (snapshotDreams.hasError) {
+          return Center(child: Text('Erreur: ${snapshotDreams.error}'));
         }
 
-        final grouped = snapshot.data ?? {};
-        //if (grouped.isEmpty) {return const Center(child: Text('Aucun rêve trouvé.'));}
+        final grouped = snapshotDreams.data ?? {};
 
         return ListView(
           children: [
-            PageHeader(title: 'Liste des rêves'),
+            const PageHeader(title: 'Liste des rêves'),
 
-            HeaderFilteredDream(
-              selectedTags: _activeTags,
-              selectedDateRange: _activeDateRange,
-              onFilterChanged: (tags, range) {
-                setState(() {
-                  _activeTags = tags;
-                  _activeDateRange = range;
-                  _groupedDreams = _loadFilteredDreams();
-                });
+            // ─────────────────────────────────────────────────────────────
+            // 🌀 À présent, on attend aussi le chargement des TAGS
+            // ─────────────────────────────────────────────────────────────
+            FutureBuilder<List<TagModel>>(
+              future: _allTagsFuture,
+              builder: (ctxTags, snapshotTags) {
+                if (snapshotTags.connectionState == ConnectionState.waiting) {
+                  // Si on veut, on peut mettre un placeholder minuscule :
+//                  return const SizedBox(
+//                    height: 60,
+//                    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+//                  );
+                  // Mais on peut aussi attendre avant d’afficher HeaderFilteredDream.
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshotTags.hasError) {
+                  return Center(child: Text('Impossible de charger les tags : ${snapshotTags.error}'));
+                }
+
+                final allTags = snapshotTags.data!;
+
+                // ───────────────────────────────────────────────────────
+                // Quand les tags sont là, on affiche le header de filtres
+                // ───────────────────────────────────────────────────────
+                return HeaderFilteredDream(
+                  // On passe la liste de tags chargée (une seule fois)
+                  allTags: allTags,
+                  selectedTags: _activeTags,
+                  selectedDateRange: _activeDateRange,
+                  onFilterChanged: (tags, range) {
+                    setState(() {
+                      _activeTags = tags;
+                      _activeDateRange = range;
+                      _groupedDreams = _loadFilteredDreams();
+                    });
+                  },
+                );
               },
             ),
 
+            const SizedBox(height: 16),
 
-
+            // Affichage des rêves groupés
             ...grouped.entries.map((entry) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

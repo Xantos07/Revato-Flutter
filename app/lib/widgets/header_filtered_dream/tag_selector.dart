@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/tag_model.dart';
-import '../viewmodels/hearder_filter_view_model.dart';
-import '../models/app_colors.dart' as models;
+import '../../models/tag_model.dart';
+import '../../viewmodels/hearder_filter_view_model.dart';
+import '../../models/app_colors.dart' as models;
 
 class TagSelector extends StatefulWidget {
   final List<TagModel> allTags;
@@ -85,10 +85,9 @@ class _TagSelectorState extends State<TagSelector> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     onSelected:
-                        (_) =>
-                            setState(() {
-                              selectedCategory = entry.key;
-                            }),
+                        (_) => setState(() {
+                          selectedCategory = entry.key;
+                        }),
                   );
                 }).toList(),
           ),
@@ -116,10 +115,15 @@ class _TagSelectorState extends State<TagSelector> {
                               )
                               : null,
                       onTap: () {
-                            isSelected
-                                ? headerFilterViewModel.removeTag(tag.name)
-                                : headerFilterViewModel.addTag(tag.name);
-                          });
+                        setState(() {
+                          if (isSelected) {
+                            headerFilterViewModel.removeTag(tag.name);
+                          } else {
+                            headerFilterViewModel.addTag(tag.name);
+                          }
+                        });
+                      },
+                    );
                   }).toList(),
             ),
           ),
