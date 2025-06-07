@@ -1,0 +1,20 @@
+name: “🔔 coucou discord !!!”
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  send-simple-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: “Coucou discord !!!”
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
+          curl -H "Content-Type: application/json" \
+               -d "{\"content\": \"📦 Nouvelle release publiée : \`${TAG_NAME}\`. Voir : ${RELEASE_URL}\"}" \
+               "$WEBHOOK_URL"
