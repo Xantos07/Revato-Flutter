@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  static const Color baseColor   = Color(0xFF6B5BE7); // violet
+  static const Color secondaryColor   = Color(0xFFEEC13C); // jaune
   static const Color previousFeeling   = Color(0xFF6B5BE7); // violet
   static const Color dreamFeeling      = Color(0xFFEAAE53); // jaune
   static const Color previousEvent     = Color(0xFF70C166); // vert

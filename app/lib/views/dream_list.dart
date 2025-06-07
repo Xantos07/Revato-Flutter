@@ -19,7 +19,7 @@ class _DreamListState extends State<DreamList> {
   final DreamListViewModel _viewModel = DreamListViewModel();
   late final HeaderFilterViewModel _headerFilterViewModel;
 
-  // 1️⃣ On déclare un Future pour charger les tags (une seule fois)
+  // On déclare un Future pour charger les tags (une seule fois)
   late final Future<List<TagModel>> _allTagsFuture;
 
   // Gestion des rêves filtrés
@@ -34,10 +34,10 @@ class _DreamListState extends State<DreamList> {
     // Instancie le ViewModel pour les filtres
     _headerFilterViewModel = HeaderFilterViewModel();
 
-    // 1️⃣ Lance l’appel asynchrone pour charger tous les tags
+    // Lance l’appel asynchrone pour charger tous les tags
     _allTagsFuture = _headerFilterViewModel.fetchTags();
 
-    // 2️⃣ Précharge les rêves (au moins une première fois) sans filtres
+    // Précharge les rêves (au moins une première fois) sans filtres
     _groupedDreams = _loadFilteredDreams();
   }
 
@@ -86,7 +86,7 @@ class _DreamListState extends State<DreamList> {
             const PageHeader(title: 'Liste des rêves'),
 
             // ─────────────────────────────────────────────────────────────
-            // 🌀 À présent, on attend aussi le chargement des TAGS
+            // À présent, on attend aussi le chargement des TAGS
             // ─────────────────────────────────────────────────────────────
             FutureBuilder<List<TagModel>>(
               future: _allTagsFuture,

@@ -164,7 +164,7 @@ class _RedactionScreenState extends State<RedactionScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: AppColors.baseColor,
                         foregroundColor: Colors.white,
                         minimumSize: const Size(130, 50),
                         shape: RoundedRectangleBorder(

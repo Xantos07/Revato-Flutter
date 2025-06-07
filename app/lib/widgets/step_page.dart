@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/app_front_parameters.dart';
 import 'champ_text_list.dart';
 import 'text_field.dart';
 
@@ -34,7 +35,7 @@ class StepPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(32),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withOpacity(AppFrontParameters.redactionFieldShadow),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     )

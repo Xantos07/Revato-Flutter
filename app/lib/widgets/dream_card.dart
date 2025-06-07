@@ -19,22 +19,27 @@ class DreamCard extends StatelessWidget {
   Widget build(BuildContext ctx) {
 
     return InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            ctx,
-            MaterialPageRoute(
-              builder: (_) => DreamDetailPage(dream: dream),
-            ),
-          );
-        },
-    child: Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => Navigator.push(
+        ctx,
+        MaterialPageRoute(builder: (_) => DreamDetailPage(dream: dream)),
       ),
-      elevation: 2,
-      child: Padding(
+
+      // ← Ici child: pour englober ton Container
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 3.0,
+              spreadRadius: 1.0,
+              offset: Offset.zero,
+            ),
+          ],
+        ),
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +49,6 @@ class DreamCard extends StatelessWidget {
               dream.title,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-
             const SizedBox(height: 8),
             Wrap(
               spacing: 6,
@@ -55,18 +59,17 @@ class DreamCard extends StatelessWidget {
                 ..._buildChips(dream.tagsDreamFeeling, AppColors.dreamFeeling),
               ],
             ),
-
             const SizedBox(height: 4),
             Text(
               dream.content.length > 40
-                  ? '${dream.content.substring(0, 40)}...'
+                  ? '${dream.content.substring(0, 40)}…'
                   : dream.content,
               style: const TextStyle(fontStyle: FontStyle.italic),
             ),
-
           ],
         ),
       ),
-    ));
+    );
+
   }
 }
