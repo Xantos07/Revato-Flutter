@@ -1,0 +1,13 @@
+{
+  "release": {
+    "tag_name": "v0.2.0",
+    "name": "Test de release local",
+    "html_url": "https://github.com/Xantos07/Revato-Flutter/releases/tag/v0.2.0",
+    "author": {
+      "login": "xantos"
+    }
+  },
+  "repository": {
+    "full_name": "xantos07/Revato-Flutter"
+  }
+}
