@@ -16,6 +16,10 @@ class LoginService
 
     public function authenticate(string $email, string $password): array
     {
+        if ('' === $email || '' === $password) {
+            return ['failure' => false, 'message' => 'email ou mot de passe incorect'];
+        }
+
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
         if (!$user || !$this->hasher->isPasswordValid($user, $password)) {
             return ['success' => false, 'message' => 'Identifiants invalides'];
