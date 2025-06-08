@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/profil_view_model.dart';
 import '../widgets/profile_option_tile.dart';
-
+import '../../widgets/page_header.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -29,11 +29,14 @@ class ProfileScreen extends StatelessWidget {
           }
 
           return Scaffold(
-            appBar: AppBar(title: const Text("Mon Profil"), centerTitle: true),
+
             body: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
               child: Column(
                 children: [
+                  PageHeader(title: "Mon profil"),
+                  const SizedBox(height: 12),
+
                   const CircleAvatar(
                     radius: 48,
                     backgroundImage: AssetImage('assets/profil.png'),

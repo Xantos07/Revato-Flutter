@@ -1,3 +1,4 @@
+import 'package:app/models/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 import '../../viewmodels/register_viewmodel.dart';
@@ -151,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: ElevatedButton(
                     onPressed: isLoading ? null : _handleRegister,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: AppColors.baseColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),

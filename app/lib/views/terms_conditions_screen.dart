@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../models/app_colors.dart';
+import '../widgets/bottom_back_button.dart';
+import '../widgets/page_header.dart';
+
 class TermsConditionsScreen extends StatelessWidget {
   const TermsConditionsScreen({Key? key}) : super(key: key);
 
@@ -29,27 +33,32 @@ Merci d’utiliser notre service en toute confiance.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Conditions d'utilisation"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: SingleChildScrollView(
-              child: Text(
-                _termsText,
-                style: const TextStyle(fontSize: 16, height: 1.6),
-                textAlign: TextAlign.justify,
+      bottomNavigationBar: const BottomBackButton(),
+
+      body: Column(
+        children: [
+          PageHeader(
+            title: "Conditions d'utilisation",
+          ),
+
+          Expanded(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      _termsText,
+                      style: const TextStyle(fontSize: 16, height: 1.6),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -13,7 +13,7 @@ class CarrouselReveApp extends StatelessWidget {
       title: 'Création de Rêve',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
-        scaffoldBackgroundColor: const Color(0xFFE4DAED),
+        scaffoldBackgroundColor: Colors.white,
       ),
       initialRoute: '/',
       routes: {

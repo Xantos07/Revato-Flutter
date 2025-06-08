@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../models/app_front_parameters.dart';
 class ChampTexte extends StatelessWidget {
   final String hint;
   final bool isLong;
@@ -29,7 +29,7 @@ class ChampTexte extends StatelessWidget {
         borderRadius: isLong ? BorderRadius.circular(16) : BorderRadius.circular(50),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(AppFrontParameters.redactionFieldShadow),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
