@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/dream.dart';
 import '../models/app_colors.dart';
+import '../widgets/bottom_back_button.dart';
 import '../widgets/highlight_tags_in_content.dart';
 import '../widgets/page_header.dart';
 
@@ -26,22 +27,7 @@ class DreamDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        bottomNavigationBar: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_back),
-              label: const Text("Retour"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ),
-        ),
+        bottomNavigationBar: const BottomBackButton(),
 
       body: SingleChildScrollView(
         child: Column(

@@ -33,7 +33,7 @@ class _TagSelectorState extends State<TagSelector> {
   @override
   Widget build(BuildContext context) {
     final categories = {
-      'beforeEvent': 'Événement',
+      'beforeEvent': 'Événement veille',
       'beforeFeeling': 'Ressenti veille',
       'dreamFeeling': 'Ressenti rêve',
     };
