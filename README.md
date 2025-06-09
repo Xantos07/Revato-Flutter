@@ -1,104 +1,168 @@
 # Revato
 
-Revato est une application multiplateforme permettant la prise de notes sur les rêves réalisés pendant la nuit.
-Elle a pour objectif de faciliter la rédaction avec la plus grande simplicité et le plus rapidement possible, afin d’archiver les rêves pour les relire plus tard.
-
-Par la suite, des graphiques sont prévus pour analyser les éléments récurrents et les mettre en relation, afin de visualiser les différentes influences.
-
-
-## 📂 Structure du projet
-
-Le projet comporte deux grandes parties : l’une concernant l’API, et l’autre, l’application côté front.
-
-```text
-Revato-flutter/
-├── api/
-├── app/
-├── caddy/
-├── php/
-├── .gitignore
-├── compose.yaml
-└── README.md
-```
-
+**Revato** est une application multiplateforme de prise de notes des rêves réalisés.
+Son objectif : vous permettre de noter rapidement vos rêves pour les archiver et les relire ultérieurement.
+À terme, des graphiques viendront analyser les éléments récurrents et leurs corrélations pour visualiser vos influences oniriques.
 
 ---
 
-## 🚀 Installation et Exécution
+## 📂 Structure du projet
 
-### 1️⃣ Prérequis
-- **Docker & Docker Compose** installés
-- **Flutter** installés
+```text
+Revato-flutter/
+├── .github/            # workflows CI/CD
+├── api/                # backend Symfony
+├── app/                # application Flutter
+├── caddy/              # configuration du serveur web Caddy
+├── php/                # Dockerfile PHP/Symfony
+├── .gitignore
+├── compose.yaml        # services Docker Compose
+└── README.md
+```
 
-Par la suite, Flutter sera intégré dans Docker. Je continue mes recherches pour pouvoir faire un build Flutter sous Docker sans que cela pose de souci. ^^
-### 2️⃣ Installation
-Cloner le dépôt :
+---
+
+## 🚀 Installation et exécution
+
+### 1. Prérequis
+
+* Docker & Docker Compose
+
+### 2. Clonage du dépôt
+
 ```bash
 git clone https://github.com/Xantos07/Revato-Flutter.git
 cd Revato-Flutter
 ```
 
-Initialisation pour un build:
+### 3. Construction des services
+
 ```bash
-docker-compose build 
+docker-compose build
 ```
 
-Lancement du build:
+### 4. Lancement en arrière-plan
+
 ```bash
 docker-compose up -d
 ```
+---
+
+### 5. Ouvrir un shell dans le container Flutter
+
+```bash
+docker-compose exec flutter bash
+```
 
 ---
 
-Schéma de la base de donnée :
+### 6. Activer le support Web et précharger le SDK
 
-
-
-Schéma Docker  :
-
-
-
----
-
-## 🛠️ Technologies & Justification
-
-| Technologie          | Raison du choix                                                              |
-|----------------------|------------------------------------------------------------------------------|
-| **Docker / Compose** | Isolation des services et portabilité ; déploiement rapide et reproductible. |
-| **MariaDB**          | Système de gestion de base de données relationnelle robuste et open source, idéal<br/> pour stocker des données structurées de manière fiable, avec de bonnes performances et une large compatibilité.           |
-| **Flutter**          | Framework multiplateforme performant permettant de développer une application <br/>mobile et web avec une base de code unique, garantissant une interface fluide et moderne.                                                               |
-| **Synfony**          | Framework PHP robuste et modulaire, idéal pour structurer une API backend <br/>sécurisée, maintenable et conforme aux bonnes pratiques.                                                               |
-| **Git**              | Système de contrôle de version distribué permettant une gestion efficace du code <br/>source, le travail en équipe, le suivi des modifications et l'intégration continue                       |
+```bash
+flutter config --enable-web    # active la plateforme web
+flutter precache --web         
+```
 
 ---
 
-Accée au container Synfony
+### 7. Vérifier l’état de Flutter et les devices
+
+```bash
+flutter doctor -v
+flutter devices
+```
+
+---
+
+### 8. Installer les dépendances Dart/Flutter
+
+```bash
+flutter pub get
+```
+
+---
+
+### 9. Lancer l’application en mode Web
+
+```bash
+flutter run -d web-server --web-hostname=localhost --web-port=9000
+```
+
+### Ouvrez ensuite dans votre navigateur hôte :
+
+```
+http://localhost:9000
+```
+
+---
+
+## 🗄️ Schémas
+
+* **Base de données**
+  ![diagramDB.png](img/diagramDB.png)
+
+---
+
+## 🛠️ Technologies & choix
+
+| Technologie          | Motivation                                                                                                 |
+| -------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Docker / Compose** | Isolation des services, portabilité et déploiement rapide et reproductible.                                |
+| **MariaDB**          | SGBDR open source, performant et fiable pour stocker des données structurées.                              |
+| **Flutter**          | Développement mobile & web multiplateforme avec une base de code unique, offrant une UI fluide et moderne. |
+| **Symfony**          | Framework PHP modulaire, sécurisé et maintenable, idéal pour structurer une API REST.                      |
+| **Git**              | Gestion de versions distribuée, facilitant le travail en équipe et l’intégration continue.                 |
+
+---
+
+## ⚙️ Commandes utiles
+
+### Accès au conteneur Symfony
+
 ```bash
 docker exec -it php82_revato bash
 ```
 
-Build sur navigateur : 
+### Lancer l’application dans un navigateur
+
 ```bash
-flutter run -d chrome --web-hostname=localhost --web-port=9000 
+flutter run -d chrome --web-hostname=localhost --web-port=9000
 ```
 
+### Liste des appareils disponibles
 
-Get device id : 
 ```bash
 flutter devices
 ```
 
-Build directement sur l'appareil en question :
+### Lancer sur un appareil spécifique
+
 ```bash
-flutter run -d idOfDevice 
+flutter run -d <device_id>
 ```
 
-Build un APK pour android
+### Génération d’un APK Android (release)
+
 ```bash
 flutter build apk --release
 ```
 
-Build pour IOS
+### Génération d’une build iOS (release)
+
 ```bash
 flutter build ios --release
 ```
+
+---
+
+
+## 📱 L'application actuelle
+
+<p align="center">
+  <img src="img/redaction-screen.png"  alt="Écran de rédaction" width="300px"/>
+  <img src="img/dream-list-screen.png"  alt="Liste des rêves" width="300px"/>
+</p>
+<p align="center">
+  <img src="img/dream-detail-screen.png"  alt="Détail d'un rêve" width="300px"/>
+  <img src="img/profile-screen.png"       alt="Profil utilisateur" width="300px"/>
+</p>
