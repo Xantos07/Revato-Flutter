@@ -50,5 +50,20 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  flutter:
+    image: ghcr.io/cirruslabs/flutter:stable
+    container_name: flutter_revato
+    volumes:
+      - ./app:/workspace
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /workspace
+    entrypoint: ["tail", "-f", "/dev/null"]
+    depends_on:
+      - php
+      - database
+    ports:
+      - "9000:9000"
+
 volumes:
   revato_db:
+  flutter_pub_cache:
