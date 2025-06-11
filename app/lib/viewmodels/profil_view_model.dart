@@ -11,7 +11,10 @@ class ProfileViewModel extends ChangeNotifier {
   UserModel? get user => _user;
   bool get isLoading => _isLoading;
 
+  bool _isLoaded = false;
+
   Future<void> loadUser() async {
+    if (_isLoaded) return;
     _isLoading = true;
     notifyListeners();
 

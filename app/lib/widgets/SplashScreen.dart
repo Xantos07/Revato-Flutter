@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../controller/authentification_controller.dart';
-import '../viewmodels/splash_viewmodel.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/profil_view_model.dart';
+import '../../viewmodels/dream_list_viewmodel.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -8,22 +9,29 @@ class SplashScreen extends StatefulWidget {
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-class _SplashScreenState extends State<SplashScreen> {
 
-  final SplashViewModel _splashViewModel = SplashViewModel(AuthController());
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    _preloadData();
   }
 
-  Future<void> _checkAuth() async {
-    await Future.delayed(const Duration(seconds: 2));
-    final isLoggedIn = await _splashViewModel.isAuthenticated();
+  Future<void> _preloadData() async {
+    try {
+      final profileVM = Provider.of<ProfileViewModel>(context, listen: false);
+      final dreamListVM = Provider.of<DreamListViewModel>(context, listen: false);
 
-    if (!mounted) return;
+      await profileVM.loadUser();
+      await dreamListVM.loadInitialDreams(); // Crée cette méthode dans DreamListViewModel
 
-    Navigator.pushReplacementNamed(context, isLoggedIn ? '/home' : '/login');
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/home');
+    } catch (e) {
+      print("Erreur de préchargement : $e");
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
   }
 
   @override

@@ -52,7 +52,12 @@ class _DreamListState extends State<DreamList> {
     });
 
     try {
-      final newDreams = await _viewModel.getDreamsByPage(_currentPage, _pageSize);
+      final newDreams = await _viewModel.getDreamsByPage(
+        _currentPage,
+        _pageSize,
+        _activeTags,
+      );
+
 
       if (!mounted) return;
 
@@ -60,11 +65,10 @@ class _DreamListState extends State<DreamList> {
         _allDreams.addAll(newDreams);
         _currentPage++;
         _hasMore = newDreams.length == _pageSize;
-
         _rebuildGroupedList();
       });
     } catch (e) {
-      if (!mounted) return; 
+      if (!mounted) return;
       print('❌ Erreur lors du chargement : $e');
     } finally {
       if (!mounted) return;
@@ -73,6 +77,7 @@ class _DreamListState extends State<DreamList> {
       });
     }
   }
+
   void _rebuildGroupedList() {
     _groupedDreamsList.clear();
     _allDreams.sort((a, b) => b.date.compareTo(a.date));
