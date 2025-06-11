@@ -47,4 +47,9 @@ class DreamListViewModel {
     }
     return map;
   }
+
+  Future<List<Dream>> getDreamsByPage(int page, int pageSize) async {
+    return await _controller.getDreamsByPage(page, pageSize);
+  }
+
 }

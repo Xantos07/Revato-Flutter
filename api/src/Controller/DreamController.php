@@ -16,12 +16,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DreamController extends AbstractController
 {
     #[Route('/api/dreams', name: 'api_dreams', methods: ['GET'])]
-    public function list(DreamService $service): JsonResponse
+    public function list(Request $request, DreamService $service): JsonResponse
     {
         $user = $this->getUser();
-        $dreams = $service->getDreamsByUser($user);
-        return $this->json($dreams);
+        $page = max((int)$request->query->get('page', 1), 1);
+        $pageSize = min((int)$request->query->get('pageSize', 3), 100);
+
+        [$dreams, $total] = $service->getDreamsByUserPaginated($user, $page, $pageSize);
+
+        return $this->json([
+            'dreams' => array_map(fn($dream) => $service->dreamToDTO($dream), $dreams),
+            'totalDreams' => $total,
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'totalPages' => ceil($total / $pageSize),
+        ]);
     }
+
+
     #[Route('/api/dreams', name: 'api_dreams_create', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function create(

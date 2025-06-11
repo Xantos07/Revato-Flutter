@@ -61,6 +61,31 @@ class DreamController {
     }
   }
 
+
+  Future<List<Dream>> getDreamsByPage(int page, int pageSize) async {
+    String? token = await storage.read(key: 'jwt');
+    final headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    final url = Uri.parse('$API_BASE_URL/api/dreams?page=$page&pageSize=$pageSize');
+
+    final response = await http.get(url, headers: headers);
+
+    print('🔎 Réponse : ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      final List<dynamic> dreamsJson = data['dreams'];
+
+      return dreamsJson.map((json) => Dream.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur HTTP: ${response.statusCode}');
+    }
+  }
+
 }
 
 
