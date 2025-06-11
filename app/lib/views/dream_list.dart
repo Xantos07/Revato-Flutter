@@ -56,6 +56,7 @@ class _DreamListState extends State<DreamList> {
         _currentPage,
         _pageSize,
         _activeTags,
+        _activeDateRange,
       );
 
 
@@ -94,6 +95,7 @@ class _DreamListState extends State<DreamList> {
 
 
   void _onFilterChanged(List<String> tags, DateTimeRange? range) {
+    print('🚀 _loadMoreDreams — _activeDateRange = $_activeDateRange');
     setState(() {
       _activeTags = tags;
       _activeDateRange = range;
@@ -101,8 +103,13 @@ class _DreamListState extends State<DreamList> {
       _hasMore = true;
       _allDreams.clear();
     });
-    _loadMoreDreams();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🧐 _onFilterChanged — avant _loadMoreDreams : _activeDateRange = $_activeDateRange');
+      _loadMoreDreams();
+    });
   }
+
+
 
   @override
   Widget build(BuildContext context) {

@@ -93,28 +93,39 @@ class DreamService
         return $dream;
     }
     // DreamService.php
-    public function getDreamsByUserPaginated($user, int $page, int $pageSize): array
+    public function getDreamsByUserPaginated($user, int $page, int $pageSize, ?string $startDate, ?string $endDate, array $tags = [])
     {
-        $queryBuilder = $this->repository->createQueryBuilder('d')
+        $qb = $this->repository->createQueryBuilder('d')
             ->where('d.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('d.date', 'DESC');
-
-        // Total count
-        $total = (clone $queryBuilder)
-            ->select('COUNT(d.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        // Pagination
-        $dreams = $queryBuilder
+            ->orderBy('d.date', 'DESC')
             ->setFirstResult(($page - 1) * $pageSize)
-            ->setMaxResults($pageSize)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($pageSize);
+
+        if ($startDate) {
+            $qb->andWhere('d.date >= :startDate')
+                ->setParameter('startDate', new \DateTime($startDate));
+        }
+
+        if ($endDate) {
+            $qb->andWhere('d.date <= :endDate')
+                ->setParameter('endDate', new \DateTime($endDate));
+        }
+
+        if (!empty($tags)) {
+            $qb->join('d.tags', 't')
+                ->andWhere('t.name IN (:tags)')
+                ->setParameter('tags', $tags);
+        }
+
+        $dreams = $qb->getQuery()->getResult();
+
+        // Pour compter le total filtré :
+        $total = $this->repository->countByUserAndDateRangeAndTags($user, $startDate, $endDate, $tags);
 
         return [$dreams, $total];
     }
+
 
 
     public function getDreamsByUser(User $user): array

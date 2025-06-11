@@ -61,8 +61,8 @@ class DreamListViewModel extends ChangeNotifier {
   }
   List<Dream> get allDreams => _allDreams;
 
-  Future<List<Dream>> getDreamsByPage(int page, int pageSize, [List<String>? tags]) async {
-    return await _controller.getDreamsByPage(page, pageSize, tags);
+  Future<List<Dream>> getDreamsByPage(int page, int pageSize, [List<String>? tags, DateTimeRange? dateRange]) async {
+    return await _controller.getDreamsByPage(page, pageSize, tags, dateRange);
   }
 
 }

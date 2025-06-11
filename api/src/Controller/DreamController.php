@@ -22,7 +22,23 @@ class DreamController extends AbstractController
         $page = max((int)$request->query->get('page', 1), 1);
         $pageSize = min((int)$request->query->get('pageSize', 3), 100);
 
-        [$dreams, $total] = $service->getDreamsByUserPaginated($user, $page, $pageSize);
+        $startDate = $request->query->get('startDate');
+        $endDate = $request->query->get('endDate');
+        $tags = $request->query->all('tags');
+        if (!is_array($tags)) {
+            $tags = [$tags];
+        }
+
+
+
+        [$dreams, $total] = $service->getDreamsByUserPaginated(
+            $user,
+            $page,
+            $pageSize,
+            $startDate,
+            $endDate,
+            $tags
+        );
 
         return $this->json([
             'dreams' => array_map(fn($dream) => $service->dreamToDTO($dream), $dreams),
@@ -32,6 +48,7 @@ class DreamController extends AbstractController
             'totalPages' => ceil($total / $pageSize),
         ]);
     }
+
 
 
     #[Route('/api/dreams', name: 'api_dreams_create', methods: ['POST'])]

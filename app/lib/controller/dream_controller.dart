@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import '../models/dream.dart';
@@ -62,11 +63,8 @@ class DreamController {
   }
 
 
-  Future<List<Dream>> getDreamsByPage(
-      int page,
-      int pageSize,
-      [List<String>? tags]
-      ) async {
+  Future<List<Dream>> getDreamsByPage(int page, int pageSize, [List<String>? tags, DateTimeRange? dateRange]) async {
+
     String? token = await storage.read(key: 'jwt');
     final headers = {
       "Content-Type": "application/json",
@@ -83,6 +81,16 @@ class DreamController {
         queryParams['tags[$i]'] = tags[i];
       }
     }
+
+    if (dateRange != null) {
+      print('📅 startDate: ${dateRange.start.toIso8601String()}');
+      print('📅 endDate: ${dateRange.end.toIso8601String()}');
+      queryParams['startDate'] = dateRange.start.toIso8601String();
+      queryParams['endDate'] = dateRange.end.toIso8601String();
+    } else {
+      print('📅 Aucune date sélectionnée');
+    }
+
 
     final url = Uri.parse('$API_BASE_URL/api/dreams').replace(queryParameters: queryParams);
 
