@@ -52,7 +52,7 @@ class DreamListViewModel extends ChangeNotifier {
 
   Future<void> loadInitialDreams() async {
     try {
-      final dreams = await getDreamsByPage(1, 3);
+      final dreams = await getDreamsByPage(1, 10);
       _cachedDreams = dreams;
     } catch (e) {
 

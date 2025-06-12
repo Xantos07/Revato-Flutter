@@ -40,7 +40,8 @@ class _DreamListState extends State<DreamList> {
   void initState() {
     super.initState();
     _headerFilterViewModel = HeaderFilterViewModel();
-    _allTagsFuture = _headerFilterViewModel.fetchTags();
+    _allTagsFuture = _headerFilterViewModel.fetchSelectedTags(_activeTags);
+
     _loadMoreDreams(); // Charge la première page
   }
 

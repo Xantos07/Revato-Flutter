@@ -15,6 +15,27 @@ class TagRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Tag::class);
     }
+    public function findPaginated(int $page, int $pageSize, ?string $category = null, ?string $search = null): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->orderBy('t.name', 'ASC')
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        if ($category !== null) {
+            $qb->andWhere('t.category = :category')
+                ->setParameter('category', $category);
+        }
+
+        if ($search !== null && trim($search) !== '') {
+            $qb->andWhere('LOWER(t.name) LIKE :search')
+                ->setParameter('search', '%' . strtolower($search) . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+
 
     //    /**
     //     * @return Tag[] Returns an array of Tag objects
