@@ -18,128 +18,155 @@ class DreamList extends StatefulWidget {
 class _DreamListState extends State<DreamList> {
   final DreamListViewModel _viewModel = DreamListViewModel();
   late final HeaderFilterViewModel _headerFilterViewModel;
+  final List<dynamic> _groupedDreamsList = [];
 
-  // On déclare un Future pour charger les tags (une seule fois)
-  late final Future<List<TagModel>> _allTagsFuture;
+  // Pagination
+  int _currentPage = 1;
+  final int _pageSize = 3;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
 
-  // Gestion des rêves filtrés
-  late Future<Map<DateTime, List<Dream>>> _groupedDreams;
+  // Données
+  List<Dream> _allDreams = [];
+
+  // Filtres
   List<String> _activeTags = [];
   DateTimeRange? _activeDateRange;
+
+  // Tags
+  late final Future<List<TagModel>> _allTagsFuture;
 
   @override
   void initState() {
     super.initState();
-
-    // Instancie le ViewModel pour les filtres
     _headerFilterViewModel = HeaderFilterViewModel();
+    _allTagsFuture = _headerFilterViewModel.fetchSelectedTags(_activeTags);
 
-    // Lance l’appel asynchrone pour charger tous les tags
-    _allTagsFuture = _headerFilterViewModel.fetchTags();
-
-    // Précharge les rêves (au moins une première fois) sans filtres
-    _groupedDreams = _loadFilteredDreams();
+    _loadMoreDreams(); // Charge la première page
   }
 
-  Future<Map<DateTime, List<Dream>>> _loadFilteredDreams() async {
-    final allDreams = await _viewModel.getAllDreams();
+  Future<void> _loadMoreDreams() async {
+    if (_isLoadingMore || !_hasMore) return;
 
-    final filtered = allDreams.where((dream) {
-      final tagMatch = _activeTags.isEmpty ||
-          _activeTags.any((tag) =>
-          dream.tagsBeforeEvent.contains(tag) ||
-              dream.tagsBeforeFeeling.contains(tag) ||
-              dream.tagsDreamFeeling.contains(tag));
-
-      final dateMatch = _activeDateRange == null ||
-          (dream.date.isAfter(_activeDateRange!.start.subtract(const Duration(days: 1))) &&
-              dream.date.isBefore(_activeDateRange!.end.add(const Duration(days: 1))));
-
-      return tagMatch && dateMatch;
+    setState(() {
+      _isLoadingMore = true;
     });
 
-    final Map<DateTime, List<Dream>> grouped = {};
-    for (final d in filtered) {
-      final dateKey = DateTime(d.date.year, d.date.month, d.date.day);
-      grouped.putIfAbsent(dateKey, () => []).add(d);
-    }
+    try {
+      final newDreams = await _viewModel.getDreamsByPage(
+        _currentPage,
+        _pageSize,
+        _activeTags,
+        _activeDateRange,
+      );
 
-    return grouped;
+
+      if (!mounted) return;
+
+      setState(() {
+        _allDreams.addAll(newDreams);
+        _currentPage++;
+        _hasMore = newDreams.length == _pageSize;
+        _rebuildGroupedList();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      print('❌ Erreur lors du chargement : $e');
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingMore = false;
+      });
+    }
   }
+
+  void _rebuildGroupedList() {
+    _groupedDreamsList.clear();
+    _allDreams.sort((a, b) => b.date.compareTo(a.date));
+    DateTime? lastDate;
+    for (final dream in _allDreams) {
+      final dateKey = DateTime(dream.date.year, dream.date.month, dream.date.day);
+      if (lastDate == null || lastDate != dateKey) {
+        _groupedDreamsList.add(dateKey);
+        lastDate = dateKey;
+      }
+      _groupedDreamsList.add(dream);
+    }
+  }
+
+
+  void _onFilterChanged(List<String> tags, DateTimeRange? range) {
+    print('🚀 _loadMoreDreams — _activeDateRange = $_activeDateRange');
+    setState(() {
+      _activeTags = tags;
+      _activeDateRange = range;
+      _currentPage = 1;
+      _hasMore = true;
+      _allDreams.clear();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🧐 _onFilterChanged — avant _loadMoreDreams : _activeDateRange = $_activeDateRange');
+      _loadMoreDreams();
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<DateTime, List<Dream>>>(
-      future: _groupedDreams,
-      builder: (ctxDreams, snapshotDreams) {
-        if (snapshotDreams.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshotDreams.hasError) {
-          return Center(child: Text('Erreur: ${snapshotDreams.error}'));
-        }
+    return Column(
+      children: [
+        const PageHeader(title: 'Liste des rêves'),
 
-        final grouped = snapshotDreams.data ?? {};
+        FutureBuilder<List<TagModel>>(
+          future: _allTagsFuture,
+          builder: (ctxTags, snapshotTags) {
+            if (snapshotTags.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshotTags.hasError) {
+              return Center(
+                  child:
+                  Text('Impossible de charger les tags : ${snapshotTags.error}'));
+            }
 
-        return ListView(
-          children: [
-            const PageHeader(title: 'Liste des rêves'),
+            final allTags = snapshotTags.data!;
 
-            // ─────────────────────────────────────────────────────────────
-            // À présent, on attend aussi le chargement des TAGS
-            // ─────────────────────────────────────────────────────────────
-            FutureBuilder<List<TagModel>>(
-              future: _allTagsFuture,
-              builder: (ctxTags, snapshotTags) {
-                if (snapshotTags.connectionState == ConnectionState.waiting) {
-                  // Si on veut, on peut mettre un placeholder minuscule :
-//                  return const SizedBox(
-//                    height: 60,
-//                    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-//                  );
-                  // Mais on peut aussi attendre avant d’afficher HeaderFilteredDream.
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshotTags.hasError) {
-                  return Center(child: Text('Impossible de charger les tags : ${snapshotTags.error}'));
-                }
+            return HeaderFilteredDream(
+              allTags: allTags,
+              selectedTags: _activeTags,
+              selectedDateRange: _activeDateRange,
+              onFilterChanged: _onFilterChanged,
+            );
+          },
+        ),
 
-                final allTags = snapshotTags.data!;
+        const SizedBox(height: 16),
 
-                // ───────────────────────────────────────────────────────
-                // Quand les tags sont là, on affiche le header de filtres
-                // ───────────────────────────────────────────────────────
-                return HeaderFilteredDream(
-                  // On passe la liste de tags chargée (une seule fois)
-                  allTags: allTags,
-                  selectedTags: _activeTags,
-                  selectedDateRange: _activeDateRange,
-                  onFilterChanged: (tags, range) {
-                    setState(() {
-                      _activeTags = tags;
-                      _activeDateRange = range;
-                      _groupedDreams = _loadFilteredDreams();
-                    });
-                  },
-                );
-              },
-            ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _groupedDreamsList.length + (_hasMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index == _groupedDreamsList.length) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _loadMoreDreams();
+                });
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            const SizedBox(height: 16),
+              final item = _groupedDreamsList[index];
 
-            // Affichage des rêves groupés
-            ...grouped.entries.map((entry) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DreamSection(date: entry.key),
-                  ...entry.value.map((d) => DreamCard(dream: d)).toList(),
-                ],
-              );
-            }).toList(),
-          ],
-        );
-      },
+              if (item is DateTime) {
+                return DreamSection(date: item);
+              } else if (item is Dream) {
+                return DreamCard(dream: item);
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
+        )
+      ],
     );
   }
 }

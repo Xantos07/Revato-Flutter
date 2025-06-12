@@ -12,18 +12,18 @@ class HomeScaffold extends StatefulWidget {
 class _HomeScaffoldState extends State<HomeScaffold> {
   int _currentIndex = 1;
   final _pages = [
-    ProfileScreen(),
-    RedactionScreen(),
-    DreamList(),
+    const ProfileScreen(),
+    const RedactionScreen(),
+    const DreamList(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
-
-
-
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomAppBar(
         elevation: 8,
         child: Container(
@@ -41,7 +41,6 @@ class _HomeScaffoldState extends State<HomeScaffold> {
                 ),
                 onPressed: () => setState(() => _currentIndex = 0),
               ),
-
               // Rédaction
               IconButton(
                 iconSize: 32,
@@ -51,7 +50,6 @@ class _HomeScaffoldState extends State<HomeScaffold> {
                 ),
                 onPressed: () => setState(() => _currentIndex = 1),
               ),
-
               // Liste
               IconButton(
                 iconSize: 28,
@@ -65,7 +63,6 @@ class _HomeScaffoldState extends State<HomeScaffold> {
           ),
         ),
       ),
-
     );
   }
 }

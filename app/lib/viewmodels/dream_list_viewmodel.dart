@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart'; // Pour DateUtils
+import 'package:flutter/material.dart';
 import '../../models/dream.dart';
 import '../../controller/dream_controller.dart';
 
-class DreamListViewModel {
+class DreamListViewModel extends ChangeNotifier {
   final DreamController _controller = DreamController();
 
   List<Dream>? _cachedDreams;
@@ -47,4 +47,22 @@ class DreamListViewModel {
     }
     return map;
   }
+
+  List<Dream> _allDreams = [];
+
+  Future<void> loadInitialDreams() async {
+    try {
+      final dreams = await getDreamsByPage(1, 10);
+      _cachedDreams = dreams;
+    } catch (e) {
+
+      print('Erreur lors du chargement initial des rêves : $e');
+    }
+  }
+  List<Dream> get allDreams => _allDreams;
+
+  Future<List<Dream>> getDreamsByPage(int page, int pageSize, [List<String>? tags, DateTimeRange? dateRange]) async {
+    return await _controller.getDreamsByPage(page, pageSize, tags, dateRange);
+  }
+
 }

@@ -64,14 +64,15 @@ class _HeaderFilteredDreamState extends State<HeaderFilteredDream> {
                 });
               },
               onDateRangePicked: (pickedRange) {
+                print('📅 Date sélectionnée dans FilterContainer: $pickedRange');
                 if (pickedRange != null) {
                   setState(() {
                     headerFilterViewModel.updateDateRange(pickedRange);
-                    widget.onFilterChanged(
-                      headerFilterViewModel.selectedTags,
-                      headerFilterViewModel.selectedDateRange,
-                    );
                   });
+                  widget.onFilterChanged(
+                    headerFilterViewModel.selectedTags,
+                    pickedRange,
+                  );
                 }
               },
               onClearDate: () {

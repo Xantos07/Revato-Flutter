@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import '../models/dream.dart';
@@ -60,6 +61,55 @@ class DreamController {
       throw Exception('Erreur: ${response.statusCode}');
     }
   }
+
+
+  Future<List<Dream>> getDreamsByPage(int page, int pageSize, [List<String>? tags, DateTimeRange? dateRange]) async {
+
+    String? token = await storage.read(key: 'jwt');
+    final headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    final Map<String, dynamic> queryParams = {
+      'page': '$page',
+      'pageSize': '$pageSize',
+    };
+
+    if (tags != null && tags.isNotEmpty) {
+      for (int i = 0; i < tags.length; i++) {
+        queryParams['tags[$i]'] = tags[i];
+      }
+    }
+
+    if (dateRange != null) {
+      print('📅 startDate: ${dateRange.start.toIso8601String()}');
+      print('📅 endDate: ${dateRange.end.toIso8601String()}');
+      queryParams['startDate'] = dateRange.start.toIso8601String();
+      queryParams['endDate'] = dateRange.end.toIso8601String();
+    } else {
+      print('📅 Aucune date sélectionnée');
+    }
+
+
+    final url = Uri.parse('$API_BASE_URL/api/dreams').replace(queryParameters: queryParams);
+
+    print('🔎 URL: $url');
+
+    final response = await http.get(url, headers: headers);
+
+    print('🔎 Réponse : ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> dreamsJson = data['dreams'];
+      return dreamsJson.map((json) => Dream.fromJson(json)).toList();
+    } else {
+      throw Exception('Erreur HTTP: ${response.statusCode}');
+    }
+  }
+
+
 
 }
 

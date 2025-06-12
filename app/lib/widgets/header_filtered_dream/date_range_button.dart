@@ -33,6 +33,11 @@ class DateRangeButton extends StatelessWidget {
             );
           },
         );
+        if (picked != null) {
+          print('📅 Date sélectionnée dans DateRangeButton : $picked');
+        } else {
+          print('📅 Sélection annulée dans DateRangeButton');
+        }
         onDateRangePicked(picked);
       },
       style: OutlinedButton.styleFrom(

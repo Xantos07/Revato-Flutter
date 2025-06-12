@@ -5,31 +5,39 @@ import '../models/tag_model.dart';
 import 'config.dart';
 
 class TagController {
-  final String baseUrl = "$API_BASE_URL/api/tags";
-  final storage = const FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage();
+  final _baseUrl = "$API_BASE_URL/api/tags";
 
-  Future<List<TagModel>> fetchUserTags() async {
-    String? token = await storage.read(key: 'jwt');
-
-    final url = Uri.parse(baseUrl);
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
+  Future<List<TagModel>> fetchTagsPaginated({
+    required int page,
+    required int pageSize,
+    String? category,
+    String? search,
+  }) async {
+    final token = await _storage.read(key: 'jwt');
+    final queryParams = {
+      'page': '$page',
+      'pageSize': '$pageSize',
+      if (category != null) 'category': category,
+      if (search != null && search.isNotEmpty) 'search': search,
     };
 
-    // Debug prints
-    print("📡 GET Tags");
-    print("URL: $url");
-    print("Headers: $headers");
-
-    final response = await http.get(url, headers: headers);
-
+    final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParams);
+    final response = await http.get(uri, headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    });
+    print('📦 Payload reçu : ${response.body}');
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => TagModel.fromJson(json)).toList();
+      final decoded = jsonDecode(response.body);
+
+
+      final List<dynamic> tagsJson = decoded['tags'];
+
+      return tagsJson.map((e) => TagModel.fromJson(e)).toList();
     } else {
-      print("❌ Erreur ${response.statusCode} : ${response.body}");
-      throw Exception('Erreur lors du chargement des tags');
+      throw Exception('Erreur de chargement paginé des tags');
     }
   }
+
 }

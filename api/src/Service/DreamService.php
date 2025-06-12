@@ -92,24 +92,70 @@ class DreamService
 
         return $dream;
     }
+    // DreamService.php
+    public function getDreamsByUserPaginated($user, int $page, int $pageSize, ?string $startDate, ?string $endDate, array $tags = [])
+    {
+        $qb = $this->repository->createQueryBuilder('d')
+            ->where('d.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('d.date', 'DESC')
+            ->setFirstResult(($page - 1) * $pageSize)
+            ->setMaxResults($pageSize);
+
+        if ($startDate) {
+            $qb->andWhere('d.date >= :startDate')
+                ->setParameter('startDate', new \DateTime($startDate));
+        }
+
+        if ($endDate) {
+            $qb->andWhere('d.date <= :endDate')
+                ->setParameter('endDate', new \DateTime($endDate));
+        }
+
+        if (!empty($tags)) {
+            $qb->leftJoin('d.tagsBeforeEvent', 'tbe')
+                ->leftJoin('d.tagsBeforeFeeling', 'tbf')
+                ->leftJoin('d.tagsDreamFeeling', 'tdf')
+                ->andWhere(
+                    $qb->expr()->orX(
+                        'tbe.name IN (:tags)',
+                        'tbf.name IN (:tags)',
+                        'tdf.name IN (:tags)'
+                    )
+                )
+                ->setParameter('tags', $tags);
+        }
+
+
+        $dreams = $qb->getQuery()->getResult();
+
+        $total = $this->repository->countByUserAndDateRangeAndTags($user, $startDate, $endDate, $tags);
+
+        return [$dreams, $total];
+    }
+
+
+
     public function getDreamsByUser(User $user): array
     {
         $dreams = $this->repository->findBy(['user' => $user]);
-
-        return array_map(function (Dream $dream) {
-            return new DreamCreateDTO(
-                date: $dream->getDate()->format('Y-m-d\TH:i:s'),
-                title: $dream->getTitle(),
-                content: $dream->getContent(),
-                feeling: $dream->getFeeling(),
-                actors: $dream->getActors()->map(fn($actor) => $actor->getName())->toArray(),
-                locations: $dream->getLocation()->map(fn($location) => $location->getName())->toArray(),
-                tagsBeforeEvent: $dream->getTagsBeforeEvent()->map(fn($tagsBeforeEvent) => $tagsBeforeEvent->getName())->toArray(),
-                tagsBeforeFeeling: $dream->getTagsBeforeFeeling()->map(fn($tagsBeforeFeeling) => $tagsBeforeFeeling->getName())->toArray(),
-                tagsDreamFeeling: $dream->getTagsDreamFeeling()->map(fn($tagsDreamFeeling) => $tagsDreamFeeling->getName())->toArray(),
-            );
-        }, $dreams);
+        return array_map(fn($dream) => $this->dreamToDTO($dream), $dreams);
     }
+    public function dreamToDTO(Dream $dream): DreamCreateDTO
+    {
+        return new DreamCreateDTO(
+            date: $dream->getDate()->format('Y-m-d\TH:i:s'),
+            title: $dream->getTitle(),
+            content: $dream->getContent(),
+            feeling: $dream->getFeeling(),
+            actors: $dream->getActors()->map(fn($actor) => $actor->getName())->toArray(),
+            locations: $dream->getLocation()->map(fn($location) => $location->getName())->toArray(),
+            tagsBeforeEvent: $dream->getTagsBeforeEvent()->map(fn($tag) => $tag->getName())->toArray(),
+            tagsBeforeFeeling: $dream->getTagsBeforeFeeling()->map(fn($tag) => $tag->getName())->toArray(),
+            tagsDreamFeeling: $dream->getTagsDreamFeeling()->map(fn($tag) => $tag->getName())->toArray(),
+        );
+    }
+
 
 
     public function delete(int $id): bool
