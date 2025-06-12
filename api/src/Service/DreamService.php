@@ -113,14 +113,22 @@ class DreamService
         }
 
         if (!empty($tags)) {
-            $qb->join('d.tags', 't')
-                ->andWhere('t.name IN (:tags)')
+            $qb->leftJoin('d.tagsBeforeEvent', 'tbe')
+                ->leftJoin('d.tagsBeforeFeeling', 'tbf')
+                ->leftJoin('d.tagsDreamFeeling', 'tdf')
+                ->andWhere(
+                    $qb->expr()->orX(
+                        'tbe.name IN (:tags)',
+                        'tbf.name IN (:tags)',
+                        'tdf.name IN (:tags)'
+                    )
+                )
                 ->setParameter('tags', $tags);
         }
 
+
         $dreams = $qb->getQuery()->getResult();
 
-        // Pour compter le total filtré :
         $total = $this->repository->countByUserAndDateRangeAndTags($user, $startDate, $endDate, $tags);
 
         return [$dreams, $total];

@@ -34,10 +34,19 @@ class DreamRepository extends ServiceEntityRepository
         }
 
         if (!empty($tags)) {
-            $qb->join('d.tags', 't')
-                ->andWhere('t.name IN (:tags)')
+            $qb->leftJoin('d.tagsBeforeEvent', 'tbe')
+                ->leftJoin('d.tagsBeforeFeeling', 'tbf')
+                ->leftJoin('d.tagsDreamFeeling', 'tdf')
+                ->andWhere(
+                    $qb->expr()->orX(
+                        'tbe.name IN (:tags)',
+                        'tbf.name IN (:tags)',
+                        'tdf.name IN (:tags)'
+                    )
+                )
                 ->setParameter('tags', $tags);
         }
+
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
